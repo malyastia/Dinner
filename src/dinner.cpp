@@ -17,9 +17,9 @@ namespace Dinning_philosophers
         
     public:
         philosopher(const char * _name, int _thinking_time, int _eating_time, int _count_eat, std::mutex &l, std::mutex &r)
-        : name(_name)
-        , count_eat(_count_eat)
-        , log(_name)
+        : count_eat(_count_eat)
+        , log( name)
+        , name(_name)
         , left_fork(l)
         , right_fork(r)
         , thinking_time(_thinking_time)
@@ -47,7 +47,6 @@ namespace Dinning_philosophers
         void eat()
         {
             std::lock(left_fork, right_fork);
-
             std::lock_guard<std::mutex> left_lock(left_fork, std::adopt_lock);
             std::lock_guard<std::mutex> right_lock(right_fork, std::adopt_lock);
             log.startActivity( ActivityType::eat );
@@ -63,8 +62,7 @@ namespace Dinning_philosophers
             log.endActivity( ActivityType::think );
         };
 
-
-        std::string name;
+        const char * name;
         int thinking_time;
         int eating_time;
         int count_eat;
@@ -80,29 +78,60 @@ namespace Dinning_philosophers
         
         std::thread threads[4];
         int i = 0;
-        {
-            _iterator it = begin_iteraton_philosopher;
-            for( ; it != end_iteraton_philosopher; ++it )
-            {
-                threads[i]=std::thread( &philosopher::work, begin_iteraton_philosopher);
-                ++i;
-            }
-        }
         
-        std::cout << "Dinner started!" << std::endl;
+        _iterator it = begin_iteraton_philosopher;
         {
+            
+            for ( i =0 ; i < 4 ; ++i)
+            {
+                threads[i] = std::thread( &philosopher::work, begin_iteraton_philosopher);
+            }  
+            
             ready = true;
-            i = 0;
+        }
+
+        {
+            for ( i =0 ; i < 4 ; ++i)
+            {
+                threads[i].join();
+            }  
+        }
+
+        std::cout << "Dinner started!" << std::endl;
+        
+        
+        
+        {
             _iterator it = begin_iteraton_philosopher;
             for( ; it != end_iteraton_philosopher; ++it )
             {
                 it->eventLog().printSummary();
-                threads[i].join();
-                i++;
             }
         }
         
+
         std::cout << "Dinner done!" << std::endl;
+
+            
+        
+        
+        
+        // {
+        //     ready = true;
+        //     for( ; i != 4; ++i )
+        //     {
+        //         threads[i].join();
+        //     }
+        // }
+        //     {
+        //         _iterator it = begin_iteraton_philosopher;
+        //         for( ; it != end_iteraton_philosopher; ++it )
+        //         {
+        //             it->eventLog().printSummary();
+        //         }
+        //     }
+
+            
 
     }
 
@@ -117,10 +146,10 @@ int main()
     std::array<Dinning_philosophers::philosopher, eat_count> philosophers
     {
         {
-            {"0", 1, 3, count_food, forks.forks[0], forks.forks[1]},
-            {"1", 2, 1, count_food, forks.forks[1], forks.forks[2]},
-            {"2", 1, 1, count_food, forks.forks[2], forks.forks[3]},
-            {"3", 2, 3, count_food, forks.forks[3], forks.forks[0]}
+            {"0", 10, 30, count_food, forks.forks[0], forks.forks[1]},
+            {"1", 20, 10, count_food, forks.forks[1], forks.forks[2]},
+            {"2", 10, 10, count_food, forks.forks[2], forks.forks[3]},
+            {"3", 20, 30, count_food, forks.forks[3], forks.forks[0]}
         }
     };
 
