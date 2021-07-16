@@ -57,7 +57,7 @@ namespace Dinning_philosophers
 
         void think()
         {
-            log.startActivity(ActivityType::eat);
+            log.startActivity(ActivityType::think);
             wait( thinking_time );
             log.endActivity( ActivityType::think );
         };
@@ -82,9 +82,10 @@ namespace Dinning_philosophers
         _iterator it = begin_iteraton_philosopher;
         {
             
-            for ( i =0 ; i < 4 ; ++i)
+            for ( i = 0 ; i < 4 ; ++i)
             {
-                threads[i] = std::thread( &philosopher::work, begin_iteraton_philosopher);
+                threads[i] = std::thread( &philosopher::work, it);
+                ++it;
             }  
             
             ready = true;
@@ -98,8 +99,6 @@ namespace Dinning_philosophers
         }
 
         std::cout << "Dinner started!" << std::endl;
-        
-        
         
         {
             _iterator it = begin_iteraton_philosopher;
