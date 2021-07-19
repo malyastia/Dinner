@@ -27,6 +27,8 @@ enum class ActivityType
 {
     eat,
     eatFailure,
+    left_folk,
+    right_folk,
     think,
     leave,
 };
@@ -35,20 +37,20 @@ class PhilosopherEventLog {
 public:
     PhilosopherEventLog(const char * philosopherName)
         : philosopherName_(philosopherName) 
-    {}
+    {};
 
     //! Called when a philosopher starts an activity
     void startActivity(ActivityType at) 
     {
         auto t = getTicksMs();
         events_.emplace_back(Event{at, int(t), true});
-    }
+    };
     //! Called when a philosopher ends an activity
     void endActivity(ActivityType at) 
     {
         auto t = getTicksMs();
         events_.emplace_back(Event{at, int(t), false});
-    }
+    };
 
     void printSummary(int stepMs = 5) const 
     {
@@ -64,11 +66,11 @@ public:
             if (ev.isStart_)
                 curFill = activityToChar(ev.activityType_);
             else
-                curFill = ' ';
+                curFill = '.';
         }
         printChars(curFill, 1);
         printf("\n");
-    }
+    };
 
 private:
     static char activityToChar(ActivityType at) 
@@ -79,14 +81,18 @@ private:
             return 'E';
         case ActivityType::eatFailure:
             return '.';
+        case ActivityType::left_folk:
+            return 'L';
+        case ActivityType::right_folk:
+            return 'R';
         case ActivityType::think:
             return 't';
         case ActivityType::leave:
-            return 'L';
+            return '*';
         default:
             return '?';
         }
-    }
+    };
     static const char* activityToString(ActivityType at) 
     {
         switch (at) 
@@ -102,12 +108,12 @@ private:
         default:
             return "???";
         }
-    }
+    };
     static void printChars(char ch, int count) 
     {
         for (int i = 0; i < count; i++)
             putchar(ch);
-    }
+    };
 
     std::string philosopherName_;
     struct Event 
