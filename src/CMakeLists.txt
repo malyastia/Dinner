@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.4)
 
-project(prog)
+add_library(dining_philosophers_exec SHARED dinner.cpp eventLog.hpp fork.hpp philosopher.hpp)
 
-set(CMAKE_CXX_STANDARD 17)
-
-add_executable(prog dinner.cpp eventLog.hpp fork.hpp)
-
-target_link_libraries(prog PRIVATE pthread)
+target_link_libraries(dining_philosophers_exec PUBLIC pthread)

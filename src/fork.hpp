@@ -3,25 +3,13 @@
 #include <atomic>
 #include <mutex>
 
-#include "philosopher.hpp"
-
 
 class fork
 {
 public:
-    bool is_free()
+    bool lock()
     {
-         return m.try_lock();
-    };
-
-    bool take_fork()
-    {
-        if(is_free())
-        {
-            m.lock();
-            return true;
-        }
-        return false;
+        return m.try_lock();
     };
     
     void put_fork()
@@ -29,6 +17,5 @@ public:
         m.unlock();
     };
 private:
-
     std::mutex m;
 };
