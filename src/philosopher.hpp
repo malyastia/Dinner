@@ -16,17 +16,16 @@ class philosopher
 {
     
 public:
-    philosopher(const char * _m_name,  int _m_thinking_time, int _m_eating_time, int _m_count_eat, fork &_m_right_fork, fork &_m_left_fork)
-    : m_count_eat(_m_count_eat)
-    , log( m_name)
-    , m_name(_m_name)
-    , m_thinking_time(_m_thinking_time)
-    , m_eating_time(_m_eating_time)
-    , m_lifethread(&philosopher::work, this)
-    , m_done(false)
-    , m_right_fork(_m_right_fork)
-    , m_left_fork(_m_left_fork)
-    // , m_waiter(_waiter)
+    philosopher(int _number_at_the_table, const char * _m_name, waiter& _waiter, int _m_thinking_time, int _m_eating_time, int _m_count_eat)
+    : m_count_eat{_m_count_eat}
+    , m_log{ m_name}
+    , m_name{_m_name}
+    , m_number_at_the_table{_number_at_the_table}
+    , m_thinking_time{_m_thinking_time}
+    , m_eating_time{_m_eating_time}
+    , m_lifethread{&philosopher::work, this}
+    , m_done{false}
+    , m_waiter{_waiter}
     {};
 
     ~philosopher()
@@ -44,7 +43,8 @@ public:
             eat();
 
         }
-        log.startActivity(ActivityType::leave);
+        
+        m_log.startActivity(ActivityType::leave);
         m_done = true;
     };
 
@@ -52,49 +52,37 @@ public:
     void eat()
     {
         bool begin_left{false};
-        while(!m_left_fork.take_fork()){
+        while(!m_waiter.forks_take(m_number_at_the_table,m_name) ){
             if (!begin_left)
             {
-                log.startActivity(ActivityType::eatFailure); 
+                m_log.startActivity(ActivityType::eatFailure); 
                 begin_left = true;
             }
         }
-        log.endActivity(ActivityType::eatFailure);
-        
-
-        bool begin_right{ false};
-
-        while(!m_right_fork.take_fork() )
-        {
-            if (!begin_right)
-            {
-                log.startActivity(ActivityType::eatFailure);
-                begin_right = true;
-            }
+        if(begin_left){
+            m_log.endActivity(ActivityType::eatFailure);
         }
-        log.endActivity(ActivityType::eatFailure);
-        
 
-        log.startActivity( ActivityType::eat );
+
+        m_log.startActivity( ActivityType::eat );
         wait( m_eating_time );
-        log.endActivity( ActivityType::eat );
+        m_log.endActivity( ActivityType::eat );
         
-        m_right_fork.put_fork();
-        m_left_fork.put_fork();
+        m_waiter.forks_put(m_number_at_the_table);
 
     };
 
     void think()
     {
-        log.startActivity(ActivityType::think);
+        m_log.startActivity(ActivityType::think);
         wait( m_thinking_time );
-        log.endActivity( ActivityType::think );
+        m_log.endActivity( ActivityType::think );
     };
 
 
     const PhilosopherEventLog& eventLog() const 
     { 
-        return log; 
+        return m_log; 
     };
 
     bool isDone(){
@@ -102,15 +90,14 @@ public:
     };
 
 private:
-    
+
+    int m_number_at_the_table;     
     const char * m_name;
     int m_thinking_time;
     int m_eating_time;
     int m_count_eat;
-    // waiter &m_waiter;
-    fork &m_right_fork;
-    fork &m_left_fork;
-    PhilosopherEventLog log;
+    waiter &m_waiter;
+    PhilosopherEventLog m_log;
     std::thread m_lifethread;
     bool m_done;
 };

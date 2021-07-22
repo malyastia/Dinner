@@ -19,8 +19,6 @@ inline int randBetween(int minVal, int maxVal) { return minVal + rand() % (maxVa
 enum class ActivityType {
     eat,
     eatFailure,
-    eatFailureleft,
-    eatFailureright,
     think,
     leave,
 };
@@ -34,13 +32,13 @@ public:
     void startActivity(ActivityType at) {
         auto t = getTicksMs();
         events_.emplace_back(Event{at, int(t), true});
-        // printf("%8.3f: %s start %s\n", t, philosopherName_.c_str(), activityToString(at));
+        printf("%8.3f: %s start %s\n", t, philosopherName_.c_str(), activityToString(at));
     }
     //! Called when a philosopher ends an activity
     void endActivity(ActivityType at) {
         auto t = getTicksMs();
         events_.emplace_back(Event{at, int(t), false});
-        // printf("%8.3f: %s end %s\n", t, philosopherName_.c_str(), activityToString(at));
+        printf("%8.3f: %s end %s\n", t, philosopherName_.c_str(), activityToString(at));
     }
 
     void printSummary(int stepMs = 5) const {
@@ -69,10 +67,6 @@ private:
             return 'E';
         case ActivityType::eatFailure:
             return '.';
-        case ActivityType::eatFailureleft:
-            return 'l';
-        case ActivityType::eatFailureright:
-            return 'r';  
         case ActivityType::think:
             return 't';
         case ActivityType::leave:

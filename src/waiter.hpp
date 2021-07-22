@@ -2,56 +2,61 @@
 #include "fork.hpp"
 
 #include <vector>
+#include <mutex>
 
-template<int _count_philosopher>
 class waiter
 {
 public:
-    waiter()
-    {
-        for (auto i=0; i < _count_philosopher; ++i)
-        {
-            m_is_free_forks.push_back(true);
-        }
+    
+    waiter( std::vector<fork> & _forks )
+    : m_forks{_forks}
+    {};
 
-    };
-
-    bool forks_free(int i)
+    bool forks_take(int i, const char * _name)
     {
-        if( i != _count_philosopher)
+        std::lock_guard<std::mutex> lock(m_mutex_waiter);
+
+        if( m_forks.at(i).take_fork() )
         {
-            if( m_is_free_forks.at(i) && m_is_free_forks.at(i+1) )
+            if( i+1 != m_forks.size() )
             {
-                if( m_forks.at(i).take_fork() && m_forks.at(i+1).take_fork())
+                if( m_forks.at(i+1).take_fork())
                 {
                     return true;
                 }
-
-                if( m_forks.at(i).is_taken() )
-                {
-                    m_forks.at(i).put_fork();
-                }
-                if( m_forks.at(i+1).is_taken() )
-                {
-                    m_forks.at(i+1).put_fork();
-                }
+                m_forks.at(i).put_fork();
                 return false;
             }
-            
+            else
+            {
+                if( m_forks.at(0).take_fork())
+                {
+                    return true;
+                }
+            }
+            m_forks.at(i).put_fork();
             return false;
             
         }
-        if( m_is_free_forks.at(i) && m_is_free_forks.at(0) )
-        {
-            return true;
-        }
-
         return false;
+
+
+        
     };
 
+    void forks_put(int i)
+    {
+        if( i+1 != m_forks.size())
+        {
+            m_forks.at(i).put_fork();
+            m_forks.at(i+1).put_fork();
+            return;
+        }
+        m_forks.at(i).put_fork();
+        m_forks.at(0).put_fork();
+    };
 
-private:
-    std::vector<bool> m_is_free_forks;
-    std::array<fork, _count_philosopher> m_forks;
-
+private: 
+    std::vector<fork> &m_forks;
+    std::mutex m_mutex_waiter;
 };
