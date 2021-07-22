@@ -1,6 +1,7 @@
 #include "eventLog.hpp"
 #include "fork.hpp"
 #include "philosopher.hpp"
+#include "waiter.hpp"
 
 #include <atomic>
 #include <condition_variable>
@@ -11,15 +12,16 @@ const size_t count_philosopher = 5;
 void dinner(int eat_count)
 {
     fork forks[count_philosopher];
+    // waiter local_waiter;
 
     std::array<philosopher, count_philosopher> philosophers
     {
         {
-            {"0", 10, 30, eat_count, forks[0], forks[1]},
-            {"1", 10, 10, eat_count, forks[1], forks[2]},
+            {"0", 5, 10, eat_count, forks[0], forks[1]},
+            {"1", 5, 10, eat_count, forks[1], forks[2]},
             {"2", 5, 10, eat_count, forks[2], forks[3]},
-            {"3", 20, 30, eat_count, forks[3], forks[4]},
-            {"4", 20, 30, eat_count, forks[4], forks[0]}
+            {"3", 5, 5, eat_count, forks[3], forks[4]},
+            {"4", 5, 10, eat_count, forks[4], forks[0]}
         }
     };
     
@@ -51,7 +53,7 @@ void dinner(int eat_count)
 
 int main()
 {
-    const int eat_count = 1;
+    const int eat_count = 2;
     dinner( eat_count);
     
     return 0;

@@ -7,15 +7,22 @@
 class fork
 {
 public:
-    bool lock()
+    bool take_fork()
     {
-        return m.try_lock();
+        m_islock = m_fork_mutex.try_lock();
+        return m_islock;
     };
     
     void put_fork()
     {
-        m.unlock();
+        m_fork_mutex.unlock();
+    };
+
+    bool is_taken()
+    {
+        return m_islock;
     };
 private:
-    std::mutex m;
+    bool m_islock;
+    std::mutex m_fork_mutex;
 };
