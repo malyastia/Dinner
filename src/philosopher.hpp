@@ -6,6 +6,7 @@
 
 #include "eventLog.hpp"
 #include "fork.hpp"
+// #include "waiter.hpp"
 #include "waiter.hpp"
 
 std::atomic_bool ready = {false};
@@ -52,7 +53,7 @@ public:
     void eat()
     {
         bool begin_left{false};
-        while(!m_waiter.forks_take(m_number_at_the_table,m_name) ){
+        while(!m_waiter.forks_take(m_number_at_the_table,m_name ) ){
             if (!begin_left)
             {
                 m_log.startActivity(ActivityType::eatFailure); 

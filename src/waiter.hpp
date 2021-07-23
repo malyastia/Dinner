@@ -16,6 +16,37 @@ public:
     {
         std::lock_guard<std::mutex> lock(m_mutex_waiter);
 
+        // log.startActivity(ActivityType::failed_in_queue);
+            // if( m_fork_request_queue.front() < m_forks.size() && m_fork_request_queue.front() > 0)
+            // {
+            //     if( m_fork_request_queue.front() == i-1 || m_fork_request_queue.front() == i+1 )
+            //     {
+            //         log.startActivity(ActivityType::failed_in_queue);
+            //         m_fork_request_queue.push(i);
+            //         return false;
+            //     }
+            // }
+
+            // if( m_fork_request_queue.front() == 0)
+            // {
+            //     if( m_fork_request_queue.front() == m_forks.size()-1 || m_fork_request_queue.front() == 0 )
+            //     {
+            //         log.startActivity(ActivityType::failed_in_queue);
+            //         m_fork_request_queue.push(i);
+            //         return false;
+            //     }
+            // }
+            // if( m_fork_request_queue.front() + 1 == m_forks.size())
+            // {
+            //     if( m_fork_request_queue.front() == i-1 || m_fork_request_queue.front() == m_forks.size()-1 )
+            //     {
+            //         log.startActivity(ActivityType::failed_in_queue);
+            //         m_fork_request_queue.push(i);
+            //         return false;
+            //     }
+            // }
+
+
         if( m_forks.at(i).take_fork() )
         {
             if( i+1 != m_forks.size() )

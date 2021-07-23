@@ -21,6 +21,7 @@ enum class ActivityType {
     eatFailure,
     think,
     leave,
+    failed_in_queue
 };
 
 class PhilosopherEventLog {
@@ -32,13 +33,13 @@ public:
     void startActivity(ActivityType at) {
         auto t = getTicksMs();
         events_.emplace_back(Event{at, int(t), true});
-        printf("%8.3f: %s start %s\n", t, philosopherName_.c_str(), activityToString(at));
+        // printf("%8.3f: %s start %s\n", t, philosopherName_.c_str(), activityToString(at));
     }
     //! Called when a philosopher ends an activity
     void endActivity(ActivityType at) {
         auto t = getTicksMs();
         events_.emplace_back(Event{at, int(t), false});
-        printf("%8.3f: %s end %s\n", t, philosopherName_.c_str(), activityToString(at));
+        // printf("%8.3f: %s end %s\n", t, philosopherName_.c_str(), activityToString(at));
     }
 
     void printSummary(int stepMs = 5) const {
@@ -71,6 +72,8 @@ private:
             return 't';
         case ActivityType::leave:
             return 'L';
+        case ActivityType::failed_in_queue:
+            return 'f';
         default:
             return '?';
         }
@@ -85,6 +88,8 @@ private:
             return "think";
         case ActivityType::leave:
             return "leave";
+        case ActivityType::failed_in_queue:
+            return "failed_in_queue";
         default:
             return "???";
         }

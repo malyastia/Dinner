@@ -2,6 +2,8 @@
 #include "fork.hpp"
 #include "philosopher.hpp"
 
+#include "waiter.hpp"
+
 #include <atomic>
 #include <condition_variable>
 #include <thread>
@@ -20,7 +22,7 @@ void dinner(int eat_count)
             {0, "0", local_waiter, 5, 10, eat_count},
             {1, "1", local_waiter, 5, 10, eat_count},
             {2, "2", local_waiter, 5, 10, eat_count},
-            {3, "3", local_waiter, 5, 5, eat_count},
+            {3, "3", local_waiter, 5, 10, eat_count},
             {4, "4", local_waiter, 5, 10, eat_count}
         }
     };
@@ -37,10 +39,8 @@ void dinner(int eat_count)
             done = true;
             for (auto& ph : philosophers)
             {
-                // std::cout << ph.isDone();
                 done = done && ph.isDone();
             };
-            // std::cout << std::endl;
             
         } while (!done);
     }
@@ -51,12 +51,11 @@ void dinner(int eat_count)
             ph.eventLog().printSummary();
         }
     
-    
 }
 
 int main()
 {
-    const int eat_count = 2;
+    const int eat_count = 20;
     dinner( eat_count);
     
     return 0;
