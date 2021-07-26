@@ -53,7 +53,7 @@ public:
     void eat()
     {
         bool begin_left{false};
-        while(!m_waiter.forks_take(m_number_at_the_table,m_name ) ){
+        while(!m_waiter.forks_take(m_number_at_the_table) ){
             if (!begin_left)
             {
                 m_log.startActivity(ActivityType::eatFailure); 

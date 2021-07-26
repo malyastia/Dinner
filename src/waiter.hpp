@@ -4,7 +4,7 @@
 #include <vector>
 #include <mutex>
 
-#include <deque>
+#include <algorithm>
 
 class waiter
 {
@@ -12,30 +12,53 @@ public:
     
     waiter( std::vector<fork> & _forks )
     : m_forks{_forks}
-    {
-        m_philosopher_request.reserve( _forks.size() );
-    };
+    {};
+
+    /*
+    0: tEEtEEL
+    1:  tt...Ett.EL
+    2: ttEEEttEEEL
+    3: tEt..EL
+    4:  ttt..EEEtttEEEL
+    */
 
 
+   /*
+            0:  tEEEt.........EEL
+            1:  tttt.........Ett...EL
+            2:  ttt......EEEtt..EEEL
+            3: tEt......EL
+            4: ttt...EEEttt.....EEEL
+   */
 
-/*
-            0
-
-            0:  t...EEt..EEL
-            1: tttEEtt.EEL
-            2: ttEttt.EL
-
-*/
-
-    bool forks_take(int index_philosopher, const char * _name)
+    bool forks_take(int index_philosopher)
     {
         std::lock_guard<std::mutex> lock(m_mutex_waiter);
 
-        if( !m_philosopher_request.empty() )
+        if( !m_philosopher_request.empty() 
+            && m_philosopher_request.at(0) != index_philosopher)
         {
-            if( m_philosopher_request.at(0) != index_philosopher )
+            if( index_philosopher+1 == m_forks.size() &&
+                ( 0 == m_philosopher_request.at(0) || index_philosopher-1 == m_philosopher_request.at(0)) )
             {
+                add_to_queue(index_philosopher);
+                return false;
             }
+            if( index_philosopher == 0 &&
+                ( index_philosopher+1 == m_philosopher_request.at(0) || m_forks.size()-1 == m_philosopher_request.at(0)) )
+            {
+                add_to_queue(index_philosopher);
+                return false;
+            }
+
+            if( index_philosopher != 0 && index_philosopher+1 != m_forks.size() &&
+                ( index_philosopher+1 == m_philosopher_request.at(0) || index_philosopher-1 == m_philosopher_request.at(0)) )
+            {
+                add_to_queue(index_philosopher);
+                return false;
+            }
+            
+
         }
 
 
@@ -83,12 +106,6 @@ private:
 
     void add_to_queue(int index_philosopher)
     {
-        if(m_philosopher_request.empty())
-        {
-            m_philosopher_request.push_back(index_philosopher);
-            return;
-        }
-
         if( !is_exists_in_queue(index_philosopher) )
         {
             m_philosopher_request.push_back(index_philosopher);
@@ -116,7 +133,10 @@ private:
     {
         if( !m_philosopher_request.empty()  )
         {
-            
+            m_philosopher_request.erase(
+                                        std::remove_if(m_philosopher_request.begin(), m_philosopher_request.end(),
+                                        [&](int x){return x ==index_philosopher; }),
+                                        m_philosopher_request.end());
         }
 
     };

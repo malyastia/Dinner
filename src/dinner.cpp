@@ -9,7 +9,7 @@
 #include <thread>
 #include <shared_mutex>
 
-const size_t count_philosopher = 3;
+const size_t count_philosopher = 5;
 void dinner(int eat_count)
 {
     std::vector<fork> forks{count_philosopher};
@@ -20,12 +20,14 @@ void dinner(int eat_count)
     {
         {
             {0, "0", local_waiter, 5, 10, eat_count},
-            {1, "1", local_waiter, 10, 10, eat_count},
-            {2, "2", local_waiter, 10, 5, eat_count},
-            // {3, "3", local_waiter, 5, 10, eat_count},
-            // {4, "4", local_waiter, 15, 20, eat_count}
+            {1, "1", local_waiter, 10, 5, eat_count},
+            {2, "2", local_waiter, 10, 15, eat_count},
+            {3, "3", local_waiter, 5, 5, eat_count},
+            {4, "4", local_waiter, 15, 15, eat_count}
         }
     };
+
+
     
 
     std::cout << "Dinner started!" << std::endl;
