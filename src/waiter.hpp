@@ -14,23 +14,6 @@ public:
     : m_forks{_forks}
     {};
 
-    /*
-    0: tEEtEEL
-    1:  tt...Ett.EL
-    2: ttEEEttEEEL
-    3: tEt..EL
-    4:  ttt..EEEtttEEEL
-    */
-
-
-   /*
-            0:  tEEEt.........EEL
-            1:  tttt.........Ett...EL
-            2:  ttt......EEEtt..EEEL
-            3: tEt......EL
-            4: ttt...EEEttt.....EEEL
-   */
-
     bool forks_take(int index_philosopher)
     {
         std::lock_guard<std::mutex> lock(m_mutex_waiter);
@@ -57,10 +40,8 @@ public:
                 add_to_queue(index_philosopher);
                 return false;
             }
-            
-
+        
         }
-
 
         if( m_forks.at(index_philosopher).take_fork() )
         {

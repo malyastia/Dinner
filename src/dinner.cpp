@@ -27,14 +27,12 @@ void dinner(int eat_count)
         }
     };
 
-
-    
-
     std::cout << "Dinner started!" << std::endl;
     
     {
         ready = true;
     };
+    
     {
         bool done;
         do {
@@ -46,8 +44,6 @@ void dinner(int eat_count)
             
         } while (!done);
     }
-    
-    
         std::cout << "Dinner done!" << std::endl;
         for(auto &ph:philosophers){
             ph.eventLog().printSummary();
