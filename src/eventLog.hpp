@@ -20,8 +20,7 @@ enum class ActivityType {
     eat,
     eatFailure,
     think,
-    leave,
-    failed_in_queue
+    leave
 };
 
 class PhilosopherEventLog {
@@ -72,8 +71,6 @@ private:
             return 't';
         case ActivityType::leave:
             return 'L';
-        case ActivityType::failed_in_queue:
-            return 'f';
         default:
             return '?';
         }
@@ -88,8 +85,6 @@ private:
             return "think";
         case ActivityType::leave:
             return "leave";
-        case ActivityType::failed_in_queue:
-            return "failed_in_queue";
         default:
             return "???";
         }

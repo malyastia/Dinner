@@ -6,8 +6,7 @@
 
 #include "eventLog.hpp"
 #include "fork.hpp"
-// #include "waiter.hpp"
-#include "waiter.hpp"
+#include "protocol.hpp"
 
 std::atomic_bool ready = {false};
 
@@ -17,7 +16,7 @@ class philosopher
 {
     
 public:
-    philosopher(int _number_at_the_table, const char * _m_name, waiter& _waiter, int _m_thinking_time, int _m_eating_time, int _m_count_eat)
+    philosopher(int _number_at_the_table, const char * _m_name, protocol& _waiter, int _m_thinking_time, int _m_eating_time, int _m_count_eat)
     : m_count_eat{_m_count_eat}
     , m_log{ m_name}
     , m_name{_m_name}
@@ -97,7 +96,7 @@ private:
     int m_thinking_time;
     int m_eating_time;
     int m_count_eat;
-    waiter &m_waiter;
+    protocol &m_waiter;
     PhilosopherEventLog m_log;
     std::thread m_lifethread;
     bool m_done;
