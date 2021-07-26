@@ -67,7 +67,6 @@ public:
 
 
         add_to_queue(index_philosopher);
-        
         return false;
         
     };

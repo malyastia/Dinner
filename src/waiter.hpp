@@ -6,7 +6,7 @@
 
 #include <algorithm>
 
-class waiter
+class waiter : public protocol
 {
 public:
     
