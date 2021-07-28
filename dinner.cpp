@@ -13,7 +13,7 @@
 
 namespace dinner_desk{
     
-const size_t count_philosopher = 4;
+const size_t count_philosopher = 6;
 void dinner(int eat_count)
 {
     std::vector<fork> forks{count_philosopher};
@@ -24,11 +24,12 @@ void dinner(int eat_count)
     std::array<philosopher, count_philosopher> philosophers
     {
         {            
-            {0, "0", local_waiter, std::chrono::milliseconds(5), std::chrono::milliseconds(10), eat_count},
-            {1, "1", local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(5), eat_count},
-            {2, "2", local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(15), eat_count},
-            {3, "3", local_waiter, std::chrono::milliseconds(5), std::chrono::milliseconds(5), eat_count},
-            // {4, "4", local_waiter, std::chrono::milliseconds(15), std::chrono::milliseconds(15), eat_count}   
+            {0, "0", local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), eat_count},
+            {1, "1", local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(10), eat_count},
+            {2, "2", local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), eat_count},
+            {3, "3", local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(5), eat_count},
+            {4, "4", local_waiter, std::chrono::milliseconds(15), std::chrono::milliseconds(15), eat_count},
+            {5, "5", local_waiter, std::chrono::milliseconds(15), std::chrono::milliseconds(15), eat_count}     
         }
     };
 
@@ -60,7 +61,7 @@ void dinner(int eat_count)
 
 int main()
 {
-    const int eat_count = 25;
+    const int eat_count = 7;
     dinner_desk::dinner( eat_count);
     
     return 0;

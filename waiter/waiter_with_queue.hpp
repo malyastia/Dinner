@@ -21,7 +21,7 @@ public:
     {
         for(auto & el: m_philosopher_request)
         {
-            el.store(0, std::memory_order_seq_cst);
+            el.store(0, std::memory_order_release);
         };
     };
 
@@ -29,30 +29,31 @@ public:
     {
         if( index_philosopher == 0 )
         {
-            if( m_philosopher_request[index_philosopher+1] > m_philosopher_request[index_philosopher] 
-                || m_philosopher_request[m_forks.size()] > m_philosopher_request[index_philosopher] )
+            if( m_philosopher_request[index_philosopher+1].load(std::memory_order_acquire) > m_philosopher_request[index_philosopher].load(std::memory_order_acquire) 
+                || m_philosopher_request[m_forks.size()-1].load(std::memory_order_acquire) > m_philosopher_request[index_philosopher].load(std::memory_order_acquire) )
             {
-                m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_seq_cst);
+                m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
                 return false;
             }
         }
 
         if( index_philosopher == m_forks.size()-1 )
         {
-            if( m_philosopher_request[index_philosopher-1] > m_philosopher_request[index_philosopher] 
-                || m_philosopher_request[0] > m_philosopher_request[index_philosopher] )
+            if( m_philosopher_request[index_philosopher-1].load(std::memory_order_acquire) > m_philosopher_request[index_philosopher].load(std::memory_order_acquire)
+                || m_philosopher_request[0].load(std::memory_order_acquire) > m_philosopher_request[index_philosopher].load(std::memory_order_acquire) )
             {
-                m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_seq_cst);
+                m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
                 return false;
             }
         }
         
-        if( index_philosopher > 0 && index_philosopher < m_forks.size()-1 )
+        if( index_philosopher > 0 && index_philosopher < m_forks.size() )
         {
-            if( m_philosopher_request[index_philosopher+1] > m_philosopher_request[index_philosopher] 
-                || m_philosopher_request[index_philosopher-1] > m_philosopher_request[index_philosopher] )
+            if( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) < m_philosopher_request[index_philosopher+1].load(std::memory_order_acquire) 
+                || m_philosopher_request[index_philosopher].load(std::memory_order_acquire) < m_philosopher_request[index_philosopher-1].load(std::memory_order_acquire) )
             {
-                m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_seq_cst);
+                m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
+                // std::cout << index_philosopher<<std::endl;
                 return false;
             }
         }
@@ -64,7 +65,7 @@ public:
             {
                 if( m_forks.at(index_philosopher+1).take_fork())
                 {
-                    m_philosopher_request[index_philosopher].store(0,std::memory_order_seq_cst);
+                    m_philosopher_request[index_philosopher].store(0,std::memory_order_release);
                     return true;
                 }
             }
@@ -72,7 +73,7 @@ public:
             {
                 if( m_forks.at(0).take_fork())
                 {
-                    m_philosopher_request[index_philosopher].store(0,std::memory_order_seq_cst);
+                    m_philosopher_request[index_philosopher].store(0,std::memory_order_release);
                     return true;
                 }
             }
@@ -80,7 +81,7 @@ public:
         } 
 
 
-        m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_seq_cst);
+        m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
                     
         return false;
         
