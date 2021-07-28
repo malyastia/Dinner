@@ -15,6 +15,7 @@ public:
     
     waiter_without_queue( std::vector<fork> & _forks )
     : m_forks{_forks}
+    , waiter{_forks}
     {};
 
     bool forks_take(int index_philosopher)
@@ -39,22 +40,8 @@ public:
             m_forks.at(index_philosopher).put_fork();
         }  
 
-
-        
         return false;
         
-    };
-
-    void forks_put(int i)
-    {
-        if( i+1 != m_forks.size())
-        {
-            m_forks.at(i).put_fork();
-            m_forks.at(i+1).put_fork();
-            return;
-        }
-        m_forks.at(i).put_fork();
-        m_forks.at(0).put_fork();
     };
 
 private:
