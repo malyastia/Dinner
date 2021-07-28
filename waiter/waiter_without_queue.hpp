@@ -19,7 +19,6 @@ public:
 
     bool forks_take(int index_philosopher)
     {
-        // std::lock_guard<std::mutex> lock(m_mutex_waiter);
 
         if( m_forks.at(index_philosopher).take_fork() )
         {
