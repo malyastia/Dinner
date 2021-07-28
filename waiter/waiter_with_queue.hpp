@@ -29,8 +29,8 @@ public:
     {
         if( index_philosopher == 0 )
         {
-            if( m_philosopher_request[index_philosopher+1].load(std::memory_order_acquire) > m_philosopher_request[index_philosopher].load(std::memory_order_acquire) 
-                || m_philosopher_request[m_forks.size()-1].load(std::memory_order_acquire) > m_philosopher_request[index_philosopher].load(std::memory_order_acquire) )
+            if( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) <= m_philosopher_request[index_philosopher+1].load(std::memory_order_acquire) 
+                || m_philosopher_request[index_philosopher].load(std::memory_order_acquire) <= m_philosopher_request[m_forks.size() -1].load(std::memory_order_acquire) )
             {
                 m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
                 return false;
@@ -39,31 +39,30 @@ public:
 
         if( index_philosopher == m_forks.size()-1 )
         {
-            if( m_philosopher_request[index_philosopher-1].load(std::memory_order_acquire) > m_philosopher_request[index_philosopher].load(std::memory_order_acquire)
-                || m_philosopher_request[0].load(std::memory_order_acquire) > m_philosopher_request[index_philosopher].load(std::memory_order_acquire) )
+            if( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) <= m_philosopher_request[index_philosopher-1].load(std::memory_order_acquire) 
+                || m_philosopher_request[index_philosopher].load(std::memory_order_acquire) <= m_philosopher_request[0].load(std::memory_order_acquire) )
             {
                 m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
                 return false;
             }
         }
-        
-        if( index_philosopher > 0 && index_philosopher < m_forks.size() )
+
+        if( index_philosopher > 0 && index_philosopher < m_forks.size()-1 )
         {
-            if( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) < m_philosopher_request[index_philosopher+1].load(std::memory_order_acquire) 
-                || m_philosopher_request[index_philosopher].load(std::memory_order_acquire) < m_philosopher_request[index_philosopher-1].load(std::memory_order_acquire) )
+            if( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) <= m_philosopher_request[index_philosopher+1].load(std::memory_order_acquire) 
+                || m_philosopher_request[index_philosopher].load(std::memory_order_acquire) <= m_philosopher_request[index_philosopher-1].load(std::memory_order_acquire) )
             {
                 m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
-                // std::cout << index_philosopher<<std::endl;
                 return false;
             }
         }
         
         
-        if( m_forks.at(index_philosopher).take_fork() )
+        if( m_forks[index_philosopher].take_fork() )
         {
             if( index_philosopher+1 != m_forks.size() )
             {
-                if( m_forks.at(index_philosopher+1).take_fork())
+                if( m_forks[index_philosopher+1].take_fork())
                 {
                     m_philosopher_request[index_philosopher].store(0,std::memory_order_release);
                     return true;
@@ -71,13 +70,13 @@ public:
             }
             else
             {
-                if( m_forks.at(0).take_fork())
+                if( m_forks[0].take_fork())
                 {
                     m_philosopher_request[index_philosopher].store(0,std::memory_order_release);
                     return true;
                 }
             }
-            m_forks.at(index_philosopher).put_fork();
+            m_forks[index_philosopher].put_fork();
         } 
 
 
