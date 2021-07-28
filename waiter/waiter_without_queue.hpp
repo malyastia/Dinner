@@ -1,21 +1,23 @@
 #pragma once
-#include "fork.hpp"
-#include "protocol.hpp"
+#include "../philosopher/fork.hpp"
+#include "waiter.hpp"
 
 #include <vector>
 #include <mutex>
 
 #include <algorithm>
 
-class waiter_with_queue : public protocol
+namespace waiter_solution{
+
+class waiter_without_queue : public waiter
 {
 public:
     
-    waiter_with_queue( std::vector<fork> & _forks )
+    waiter_without_queue( std::vector<fork> & _forks )
     : m_forks{_forks}
     {};
 
-    bool forks_take(int index_philosopher) 
+    bool forks_take(int index_philosopher)
     {
         std::lock_guard<std::mutex> lock(m_mutex_waiter);
 
@@ -67,6 +69,7 @@ public:
 
 
         add_to_queue(index_philosopher);
+        
         return false;
         
     };
@@ -128,3 +131,5 @@ private:
     std::vector<int> m_philosopher_request;
 
 };
+
+}; //namespace waiter_solution

@@ -5,14 +5,13 @@
 #include <vector>
 #include <string>
 
+
 inline float getTicksMs() {
     using Clock = std::chrono::steady_clock;
     static auto zero = Clock::now();
     auto t = Clock::now();
     return std::chrono::duration_cast<std::chrono::microseconds>(t - zero).count() / 1000.0f;
 }
-
-inline void wait(int numMs) { std::this_thread::sleep_for(std::chrono::milliseconds(numMs)); }
 
 inline int randBetween(int minVal, int maxVal) { return minVal + rand() % (maxVal - minVal); }
 
@@ -25,7 +24,7 @@ enum class ActivityType {
 
 class PhilosopherEventLog {
 public:
-    PhilosopherEventLog(const char* philosopherName)
+    PhilosopherEventLog(std::string philosopherName)
         : philosopherName_(philosopherName) {}
 
     //! Called when a philosopher starts an activity

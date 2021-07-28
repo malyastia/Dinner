@@ -6,7 +6,7 @@
 
 #include "eventLog.hpp"
 #include "fork.hpp"
-#include "protocol.hpp"
+#include "../waiter/waiter.hpp"
 
 std::atomic_bool ready = {false};
 
@@ -16,7 +16,7 @@ class philosopher
 {
     
 public:
-    philosopher(int _number_at_the_table, const char * _m_name, protocol& _waiter, int _m_thinking_time, int _m_eating_time, int _m_count_eat)
+    philosopher(int _number_at_the_table, std::string _m_name, waiter_solution::waiter& _waiter, std::chrono::milliseconds _m_thinking_time, std::chrono::milliseconds _m_eating_time, int _m_count_eat)
     : m_count_eat{_m_count_eat}
     , m_log{ m_name}
     , m_name{_m_name}
@@ -48,6 +48,16 @@ public:
         m_done = true;
     };
 
+    const PhilosopherEventLog& eventLog() const 
+    { 
+        return m_log; 
+    };
+
+    bool isDone(){
+        return m_done;
+    };
+
+private:
 
     void eat()
     {
@@ -72,6 +82,12 @@ public:
 
     };
 
+    inline void wait(std::chrono::milliseconds numMs) 
+    { 
+        std::this_thread::sleep_for(std::chrono::milliseconds(numMs)); 
+    };
+
+
     void think()
     {
         m_log.startActivity(ActivityType::think);
@@ -80,23 +96,13 @@ public:
     };
 
 
-    const PhilosopherEventLog& eventLog() const 
-    { 
-        return m_log; 
-    };
-
-    bool isDone(){
-        return m_done;
-    };
-
-private:
 
     int m_number_at_the_table;     
-    const char * m_name;
-    int m_thinking_time;
-    int m_eating_time;
+    std::string m_name;
+    std::chrono::milliseconds m_thinking_time;
+    std::chrono::milliseconds m_eating_time;
     int m_count_eat;
-    protocol &m_waiter;
+    waiter_solution::waiter &m_waiter;
     PhilosopherEventLog m_log;
     std::thread m_lifethread;
     bool m_done;
