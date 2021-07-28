@@ -9,19 +9,18 @@
 
 namespace waiter_solution{
 
+template<size_t count_philosopher>
 class waiter_with_queue : public waiter
 {
 public:
     
     waiter_with_queue( std::vector<fork> & _forks )
     : m_forks{_forks}
-    {
-        m_use_fork.reserve(_forks.size());
-    };
+    {};
 
     bool forks_take(int index_philosopher) 
     {
-        std::lock_guard<std::mutex> lock(m_mutex_waiter);
+        // std::lock_guard<std::mutex> lock(m_mutex_waiter);
 
         if( !m_philosopher_request.empty() 
             && m_philosopher_request.at(0) != index_philosopher)
@@ -129,8 +128,8 @@ private:
     
     std::vector<fork> &m_forks;
     std::mutex m_mutex_waiter;
-    std::vector<std::atomic_bool> m_use_fork;
     std::vector<int> m_philosopher_request;
+    std::array<std::atomic_bool, count_philosopher> m_philosopher_hungry;
 
 };
 }; // namespace waiter_solution

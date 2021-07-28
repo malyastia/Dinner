@@ -19,7 +19,7 @@ void dinner(int eat_count)
     std::vector<fork> forks{count_philosopher};
 
     waiter_solution::waiter_without_queue local_waiter{forks};
-    // waiter_with_queue local_waiter{forks};
+    // waiter_solution::waiter_with_queue<count_philosopher> local_waiter{forks};
 
     std::array<philosopher, count_philosopher> philosophers
     {
