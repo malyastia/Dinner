@@ -1,5 +1,5 @@
 #pragma once
-#include "../philosopher/fork.hpp"
+#include "../philosopher_and fork/fork.hpp"
 #include "waiter.hpp"
 
 #include <vector>

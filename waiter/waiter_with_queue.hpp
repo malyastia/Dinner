@@ -1,5 +1,5 @@
 #pragma once
-#include "../philosopher/fork.hpp"
+#include "../philosopher_and fork/fork.hpp"
 #include "waiter.hpp"
 
 #include <vector>
@@ -27,58 +27,51 @@ public:
 
     bool forks_take(int index_philosopher) 
     {
-        if( index_philosopher == 0 )
+        if( index_philosopher == 0 
+            && ( m_philosopher_request[index_philosopher].load(std::memory_order_consume) <= m_philosopher_request[index_philosopher+1].load(std::memory_order_consume) 
+                || m_philosopher_request[index_philosopher].load(std::memory_order_consume) <= m_philosopher_request[m_forks.size() -1].load(std::memory_order_consume) ) )
         {
-            if( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) <= m_philosopher_request[index_philosopher+1].load(std::memory_order_acquire) 
-                || m_philosopher_request[index_philosopher].load(std::memory_order_acquire) <= m_philosopher_request[m_forks.size() -1].load(std::memory_order_acquire) )
-            {
-                m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
-                return false;
-            }
+            m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
+            return false;
+        
         }
 
-        if( index_philosopher == m_forks.size()-1 )
+        if( index_philosopher == m_forks.size()-1 && 
+            ( m_philosopher_request[index_philosopher].load(std::memory_order_consume) <= m_philosopher_request[index_philosopher-1].load(std::memory_order_consume) 
+                || m_philosopher_request[index_philosopher].load(std::memory_order_consume) <= m_philosopher_request[0].load(std::memory_order_consume) ) )
         {
-            if( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) <= m_philosopher_request[index_philosopher-1].load(std::memory_order_acquire) 
-                || m_philosopher_request[index_philosopher].load(std::memory_order_acquire) <= m_philosopher_request[0].load(std::memory_order_acquire) )
-            {
-                m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
-                return false;
-            }
+            m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
+            return false;
+            
         }
 
-        if( index_philosopher > 0 && index_philosopher < m_forks.size()-1 )
+        if( index_philosopher > 0 && index_philosopher < m_forks.size()-1 &&
+            ( m_philosopher_request[index_philosopher].load(std::memory_order_consume) <= m_philosopher_request[index_philosopher+1].load(std::memory_order_consume) 
+                || m_philosopher_request[index_philosopher].load(std::memory_order_consume) <= m_philosopher_request[index_philosopher-1].load(std::memory_order_consume) ) )
         {
-            if( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) <= m_philosopher_request[index_philosopher+1].load(std::memory_order_acquire) 
-                || m_philosopher_request[index_philosopher].load(std::memory_order_acquire) <= m_philosopher_request[index_philosopher-1].load(std::memory_order_acquire) )
-            {
-                m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
-                return false;
-            }
+            m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
+            return false;
+            
         }
-        
-        
-        if( m_forks[index_philosopher].take_fork() )
+
+        if( m_forks[index_philosopher].take_fork()  )
         {
-            if( index_philosopher+1 != m_forks.size() )
+            if( index_philosopher+1 != m_forks.size() && m_forks[index_philosopher+1].take_fork())
             {
-                if( m_forks[index_philosopher+1].take_fork())
-                {
-                    m_philosopher_request[index_philosopher].store(0,std::memory_order_release);
-                    return true;
-                }
+                m_philosopher_request[index_philosopher].store(0,std::memory_order_release);
+                return true;
+                
             }
-            else
+            
+            if( index_philosopher+1 == m_forks.size() && m_forks[0].take_fork())
             {
-                if( m_forks[0].take_fork())
-                {
-                    m_philosopher_request[index_philosopher].store(0,std::memory_order_release);
-                    return true;
-                }
+                m_philosopher_request[index_philosopher].store(0,std::memory_order_release);
+                return true;
             }
+
             m_forks[index_philosopher].put_fork();
-        } 
-
+        }
+        
 
         m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
                     
@@ -87,6 +80,7 @@ public:
     };
 
 private:
+
 
     std::vector<fork> &m_forks;
     std::mutex m_mutex_waiter;

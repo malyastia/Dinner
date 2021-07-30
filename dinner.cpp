@@ -1,6 +1,6 @@
-#include "philosopher/eventLog.hpp"
-#include "philosopher/fork.hpp"
-#include "philosopher/philosopher.hpp"
+#include "logger/eventLog.hpp"
+#include "philosopher_and fork/fork.hpp"
+#include "philosopher_and fork/philosopher.hpp"
 
 #include "waiter/waiter.hpp"
 #include "waiter/waiter_without_queue.hpp"
@@ -13,7 +13,7 @@
 
 namespace dinner_desk{
     
-const size_t count_philosopher = 6;
+const size_t count_philosopher = 3;
 void dinner(int eat_count)
 {
     std::vector<fork> forks{count_philosopher};
@@ -21,47 +21,45 @@ void dinner(int eat_count)
     // waiter_solution::waiter_without_queue local_waiter{forks};
     waiter_solution::waiter_with_queue local_waiter{forks};
 
+    philosopher_setting philosoph1 {"0", local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), eat_count};
+
+    
     std::array<philosopher, count_philosopher> philosophers
     {
-        {            
-            {0, "0", local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), eat_count},
-            {1, "1", local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), eat_count},
-            {2, "2", local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), eat_count},
-            {3, "3", local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), eat_count},
-            {4, "4", local_waiter, std::chrono::milliseconds(15), std::chrono::milliseconds(25), eat_count},
-            {5, "5", local_waiter, std::chrono::milliseconds(15), std::chrono::milliseconds(25), eat_count}     
+        {        
+            {0,philosoph1},
+            {1,philosoph1},
+            {2,philosoph1}, 
+            // philosoph1, 
+            // philosoph1, 
+            // philosoph1
         }
+        
     };
 
-    std::cout << "Dinner started!" << std::endl;
-    
+
     {
         ready = true;
-    };
-    
-    {
-        bool done;
-        do {
-            done = true;
-            for (auto& ph : philosophers)
-            {
-                done = done && ph.isDone();
-            };
-            
-        } while (!done);
+        for(auto &ph:philosophers){
+            ph.joining_thread();
+        } 
     }
+    std::cout << "Dinner started!" << std::endl;
+
+    
         std::cout << "Dinner done!" << std::endl;
         for(auto &ph:philosophers){
             ph.eventLog().printSummary();
         }
     
 }
+
 }; //dinner_desk
 
 
 int main()
 {
-    const int eat_count = 2;
+    const int eat_count = 5;
     dinner_desk::dinner( eat_count);
     
     return 0;
