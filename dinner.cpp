@@ -13,7 +13,7 @@
 
 namespace dinner_desk{
     
-const size_t count_philosopher = 3;
+const size_t count_philosopher = 6;
 void dinner(int eat_count)
 {
     std::vector<fork> forks{count_philosopher};
@@ -30,27 +30,24 @@ void dinner(int eat_count)
             {0,philosoph1},
             {1,philosoph1},
             {2,philosoph1}, 
-            // philosoph1, 
-            // philosoph1, 
-            // philosoph1
+            {3,philosoph1}, 
+            {4,philosoph1},  
+            {5,philosoph1}, 
         }
         
     };
 
 
-    {
-        ready = true;
-        for(auto &ph:philosophers){
-            ph.joining_thread();
-        } 
-    }
-    std::cout << "Dinner started!" << std::endl;
-
     
-        std::cout << "Dinner done!" << std::endl;
-        for(auto &ph:philosophers){
-            ph.eventLog().printSummary();
-        }
+    ready = true;        
+    for(auto &ph:philosophers){
+            ph.joining_thread() ;
+    } 
+
+    for(auto &ph:philosophers){
+        ph.eventLog().printSummary();
+    }
+  
     
 }
 

@@ -6,5 +6,5 @@ add_executable(dining_philosophers dinner.cpp )
 set(CMAKE_CXX_STANDARD 17)
 
 # add_subdirectory(
-target_include_directories(${PROJECT_NAME} PRIVATE philosopher waiter)
+target_include_directories(${PROJECT_NAME} PRIVATE philosopher_and fork waiter)
 target_link_libraries(${PROJECT_NAME} PRIVATE pthread)
