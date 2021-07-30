@@ -56,7 +56,7 @@ void dinner(int eat_count)
 
 int main()
 {
-    const int eat_count = 5;
+    const int eat_count = 10;
     dinner_desk::dinner( eat_count);
     
     return 0;
