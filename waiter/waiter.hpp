@@ -5,14 +5,18 @@ namespace waiter_solution{
 class waiter
 {
 public:
-    waiter(std::vector<fork> & _forks)
+    waiter(std::vector<fork::fork> & _forks)
     :m_forks{_forks}
     {};
 
     virtual ~waiter(){};
     
-    virtual bool forks_take(int index_philosopher) 
+    bool forks_take(int index_philosopher) 
     {
+        if( can_take_fork(index_philosopher) )
+        {
+            return true;  
+        };
         return false;
     };
     
@@ -28,7 +32,12 @@ public:
         m_forks.at(0).put_fork();
     };
 private:
-    std::vector<fork> &m_forks;
+    virtual bool can_take_fork(int index_philosopher)
+    {
+        return false;
+    };
+
+    std::vector<fork::fork> &m_forks;
 
 };
 }; // namespace waiter_solution

@@ -8,6 +8,8 @@
 #include "fork.hpp"
 #include "../waiter/waiter.hpp"
 
+namespace philosopher{
+
 std::atomic_bool ready = {false};
 
 class fork;
@@ -28,8 +30,9 @@ struct philosopher_setting
     std::chrono::milliseconds m_thinking_time;
     std::chrono::milliseconds m_eating_time;
     waiter_solution::waiter& m_waiter;
-    PhilosopherEventLog m_log;
+    logger::PhilosopherEventLog m_log;
 };
+
 
 class philosopher
 {
@@ -75,10 +78,10 @@ public:
 
         }
         
-        m_log.startActivity(ActivityType::leave);
+        m_log.startActivity(logger::ActivityType::leave);
     };
 
-    const PhilosopherEventLog& eventLog() const 
+    const logger::PhilosopherEventLog& eventLog() const 
     { 
         return m_log; 
     };
@@ -92,18 +95,18 @@ private:
         while(!m_philosopher_setting.m_waiter.forks_take(m_number_at_the_table) ){
             if (!begin_left)
             {
-                m_log.startActivity(ActivityType::eatFailure); 
+                m_log.startActivity(logger::ActivityType::eatFailure); 
                 begin_left = true;
             }
         }
         if(begin_left){
-            m_log.endActivity(ActivityType::eatFailure);
+            m_log.endActivity(logger::ActivityType::eatFailure);
         }
 
 
-        m_log.startActivity( ActivityType::eat );
+        m_log.startActivity( logger::ActivityType::eat );
         wait( m_eating_time );
-        m_log.endActivity( ActivityType::eat );
+        m_log.endActivity( logger::ActivityType::eat );
         
         m_philosopher_setting.m_waiter.forks_put(m_number_at_the_table);
 
@@ -117,9 +120,9 @@ private:
 
     void think()
     {
-        m_log.startActivity(ActivityType::think);
+        m_log.startActivity(logger::ActivityType::think);
         wait( m_thinking_time );
-        m_log.endActivity( ActivityType::think );
+        m_log.endActivity( logger::ActivityType::think );
     };
 
 
@@ -130,9 +133,10 @@ private:
     std::chrono::milliseconds m_eating_time;
     int m_count_eat;
     // waiter_solution::waiter &m_waiter;
-    PhilosopherEventLog m_log;
+    logger::PhilosopherEventLog m_log;
 
     philosopher_setting& m_philosopher_setting;
 
     std::thread m_lifethread;
 };
+}; //namespace philosopher

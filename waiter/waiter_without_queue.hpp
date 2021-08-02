@@ -13,12 +13,15 @@ class waiter_without_queue : public waiter
 {
 public:
     
-    waiter_without_queue( std::vector<fork> & _forks )
+    waiter_without_queue( std::vector<fork::fork> & _forks )
     : m_forks{_forks}
     , waiter{_forks}
     {};
 
-    bool forks_take(int index_philosopher)
+    
+
+private:
+    bool can_take_fork(int index_philosopher)
     {
 
         if( m_forks.at(index_philosopher).take_fork() )
@@ -44,9 +47,7 @@ public:
         
     };
 
-private:
-
-    std::vector<fork> &m_forks;
+    std::vector<fork::fork> &m_forks;
     std::mutex m_mutex_waiter;
 
 };

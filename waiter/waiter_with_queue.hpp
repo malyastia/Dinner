@@ -14,7 +14,7 @@ class waiter_with_queue : public waiter
 {
 public:
     
-    waiter_with_queue( std::vector<fork> & _forks )
+    waiter_with_queue( std::vector<fork::fork> & _forks )
     : m_forks{_forks}
     , waiter{_forks}
     , m_philosopher_request(_forks.size())
@@ -25,9 +25,12 @@ public:
         };
     };
 
-    bool forks_take(int index_philosopher) 
+    
+
+private:
+
+    bool can_take_fork(int index_philosopher) 
     {
-       
         if( index_philosopher == 0 
             && ( m_philosopher_request[index_philosopher].load(std::memory_order_consume) < m_philosopher_request[index_philosopher+1].load(std::memory_order_consume) 
                 || m_philosopher_request[index_philosopher].load(std::memory_order_consume) < m_philosopher_request[m_forks.size() -1].load(std::memory_order_consume) ) )
@@ -73,18 +76,14 @@ public:
             m_forks[index_philosopher].put_fork();
         }
         
-
+        
         m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
                     
         return false;
         
     };
 
-private:
-
-
-
-    std::vector<fork> &m_forks;
+    std::vector<fork::fork> &m_forks;
     std::mutex m_mutex_waiter;
     std::vector<std::atomic_int> m_philosopher_request;
     // std::array<std::atomic_bool, count_philosopher> m_philosopher_hungry;

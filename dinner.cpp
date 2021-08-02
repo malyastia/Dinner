@@ -16,15 +16,15 @@ namespace dinner_desk{
 const size_t count_philosopher = 6;
 void dinner(int eat_count)
 {
-    std::vector<fork> forks{count_philosopher};
+    std::vector<fork::fork> forks{count_philosopher};
 
     // waiter_solution::waiter_without_queue local_waiter{forks};
     waiter_solution::waiter_with_queue local_waiter{forks};
 
-    philosopher_setting philosoph1 {"0", local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), eat_count};
+    philosopher::philosopher_setting philosoph1 {"0", local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), eat_count};
 
     
-    std::array<philosopher, count_philosopher> philosophers
+    std::array<philosopher::philosopher, count_philosopher> philosophers
     {
         {        
             {0,philosoph1},
@@ -39,7 +39,7 @@ void dinner(int eat_count)
 
 
     
-    ready = true;        
+    philosopher:: ready = true;        
     for(auto &ph:philosophers){
             ph.joining_thread() ;
     } 
