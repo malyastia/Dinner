@@ -1,22 +1,22 @@
 #pragma once
-#include "../philosopher_and fork/fork.hpp"
-#include "waiter.hpp"
+#include "../philosopher_and_fork/fork.hpp"
+#include "waiter_without_queue.hpp"
 
 #include <vector>
 #include <mutex>
 
 #include <algorithm>
 
-namespace waiter_solution{
+namespace dinner{
 
 // template<size_t count_philosopher>
-class waiter_with_queue : public waiter
+class waiter_with_queue : public waiter_without_queue
 {
 public:
     
-    waiter_with_queue( std::vector<fork::fork> & _forks )
+    waiter_with_queue( std::vector<fork> & _forks )
     : m_forks{_forks}
-    , waiter{_forks}
+    , waiter_without_queue{_forks}
     , m_philosopher_request(_forks.size())
     {
         for(auto & el: m_philosopher_request)
@@ -25,33 +25,29 @@ public:
         };
     };
 
-    
-
-private:
-
-    bool can_take_fork(int index_philosopher) 
+    bool forks_take(int index_philosopher) 
     {
         if( index_philosopher == 0 
-            && ( m_philosopher_request[index_philosopher].load(std::memory_order_consume) < m_philosopher_request[index_philosopher+1].load(std::memory_order_consume) 
-                || m_philosopher_request[index_philosopher].load(std::memory_order_consume) < m_philosopher_request[m_forks.size() -1].load(std::memory_order_consume) ) )
+            && ( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) < m_philosopher_request[index_philosopher+1].load(std::memory_order_acquire) 
+            || m_philosopher_request[index_philosopher].load(std::memory_order_acquire) < m_philosopher_request[m_forks.size() -1].load(std::memory_order_acquire) ) )
         {
             m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
             return false;
         
         }
 
-        if( index_philosopher == m_forks.size()-1 && 
-            ( m_philosopher_request[index_philosopher].load(std::memory_order_consume) < m_philosopher_request[index_philosopher-1].load(std::memory_order_consume) || 
-                m_philosopher_request[index_philosopher].load(std::memory_order_consume) < m_philosopher_request[0].load(std::memory_order_consume) ) )
+        if( index_philosopher == m_forks.size()-1 
+            && ( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) < m_philosopher_request[index_philosopher-1].load(std::memory_order_acquire) 
+            || m_philosopher_request[index_philosopher].load(std::memory_order_acquire) < m_philosopher_request[0].load(std::memory_order_acquire) ) )
         {
             m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
             return false;
             
         }
 
-        if( index_philosopher != 0 && index_philosopher != m_forks.size()-1 &&
-            ( m_philosopher_request[index_philosopher].load(std::memory_order_consume) < m_philosopher_request[index_philosopher+1].load(std::memory_order_consume) || 
-                m_philosopher_request[index_philosopher].load(std::memory_order_consume) < m_philosopher_request[index_philosopher-1].load(std::memory_order_consume) ) )
+        if( index_philosopher != 0 && index_philosopher != m_forks.size()-1 
+            && ( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) < m_philosopher_request[index_philosopher+1].load(std::memory_order_acquire) 
+            || m_philosopher_request[index_philosopher].load(std::memory_order_acquire) < m_philosopher_request[index_philosopher-1].load(std::memory_order_acquire) ) )
         {
             m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
             return false;
@@ -63,6 +59,7 @@ private:
             if( index_philosopher+1 != m_forks.size() && m_forks[index_philosopher+1].take_fork())
             {
                 m_philosopher_request[index_philosopher].store(0,std::memory_order_release);
+                
                 return true;
                 
             }
@@ -80,13 +77,24 @@ private:
         m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
                     
         return false;
-        
-    };
 
-    std::vector<fork::fork> &m_forks;
-    std::mutex m_mutex_waiter;
+    }
+
+
+    
+
+private:
+
+    std::vector<fork> &m_forks;
     std::vector<std::atomic_int> m_philosopher_request;
-    // std::array<std::atomic_bool, count_philosopher> m_philosopher_hungry;
 
 };
-}; // namespace waiter_solution
+}; // namespace dinner
+
+/*
+
+
+
+
+
+*/

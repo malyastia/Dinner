@@ -1,11 +1,11 @@
 #pragma once
 
-namespace waiter_solution{
+namespace dinner{
 
 class waiter
 {
 public:
-    waiter(std::vector<fork::fork> & _forks)
+    waiter(std::vector<fork> & _forks)
     :m_forks{_forks}
     {};
 
@@ -37,7 +37,7 @@ private:
         return false;
     };
 
-    std::vector<fork::fork> &m_forks;
+    std::vector<fork> &m_forks;
 
 };
-}; // namespace waiter_solution
+}; // namespace dinner

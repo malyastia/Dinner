@@ -3,7 +3,7 @@
 #include <atomic>
 #include <mutex>
 
-namespace fork{
+namespace dinner{
     
 class fork
 {
@@ -24,4 +24,4 @@ public:
 private:
     std::mutex m_fork_mutex;
 };
-}; //namespace fork
+} //namespace dinner

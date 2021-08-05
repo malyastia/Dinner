@@ -5,7 +5,9 @@
 #include <vector>
 #include <string>
 
-namespace logger{
+namespace dinner{
+
+namespace lib_logger{
 inline float getTicksMs() {
     using Clock = std::chrono::steady_clock;
     static auto zero = Clock::now();
@@ -101,4 +103,6 @@ private:
     };
     std::vector<Event> events_;
 };
-}; // namespace logger
+} // namespace logger
+
+} // namespace dinner
