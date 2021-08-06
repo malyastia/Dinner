@@ -7,17 +7,18 @@
 #include "../logger/eventLog.hpp"
 #include "fork.hpp"
 #include "../waiter/waiter_without_queue.hpp"
+#include "../waiter/unique_take.hpp"
 
 namespace dinner{
 
 std::atomic_bool ready = {false};
 
-class fork;
 
+template<class _waiter_T>
 struct philosopher_setting
 {
     philosopher_setting(int _number_at_the_table,
-        waiter_without_queue & _waiter,
+        _waiter_T & _waiter,
         std::chrono::milliseconds _thinking_time,
         std::chrono::milliseconds _eating_time,
         std::chrono::milliseconds _falling_time,
@@ -37,17 +38,17 @@ struct philosopher_setting
     std::chrono::milliseconds m_thinking_time;
     std::chrono::milliseconds m_eating_time;
     std::chrono::milliseconds m_falling_time;
-    waiter_without_queue& m_waiter;
+    _waiter_T& m_waiter;
     dinner::lib_logger::PhilosopherEventLog m_log;
 };
 
-
+template<class _waiter_T>
 class philosopher
 {
     
 public:
-
-    philosopher( philosopher_setting _philosopher_setting)
+    
+    philosopher( philosopher_setting<_waiter_T> _philosopher_setting)
     : m_lifethread { &philosopher::work, this }
     , m_philosopher_setting {_philosopher_setting}
     {};
@@ -75,7 +76,11 @@ public:
         for(int i = 0; i < m_philosopher_setting.m_count_eat; ++i)
         {
             think();
-            eat();
+            while( ! eat() )
+            {
+                wait(lib_logger::ActivityType::eatFailure, m_philosopher_setting.m_falling_time);
+                
+            }
 
         }
         
@@ -90,23 +95,21 @@ public:
 
 private:
 
-    void eat()
+    bool eat()
     {
-        bool begin_left{false};
-        while(!m_philosopher_setting.m_waiter.forks_take(m_philosopher_setting.m_number_at_the_table) ){
-            if (!begin_left)
-            {
-                m_philosopher_setting.m_log.startActivity(dinner::lib_logger::ActivityType::eatFailure); 
-                begin_left = true;
-            }
-        }
-        if(begin_left){
-            m_philosopher_setting.m_log.endActivity(lib_logger::ActivityType::eatFailure);
+        unique_take tmp = m_philosopher_setting.m_waiter.forks_take(m_philosopher_setting.m_number_at_the_table);
+
+        if( !tmp.is_succes() ){
+            return false;
         }
 
-        wait( lib_logger::ActivityType::eat, m_philosopher_setting.m_eating_time );
+        m_philosopher_setting.m_log.startActivity(lib_logger::ActivityType::eat);
+        std::this_thread::sleep_for(std::chrono::milliseconds(m_philosopher_setting.m_eating_time )); 
+        m_philosopher_setting.m_log.endActivity( lib_logger::ActivityType::eat );
         
-        m_philosopher_setting.m_waiter.forks_put(m_philosopher_setting.m_number_at_the_table);
+        return true;
+        
+        // m_philosopher_setting.m_waiter.forks_put(m_philosopher_setting.m_number_at_the_table);
 
     };
 
@@ -124,10 +127,11 @@ private:
         wait(lib_logger::ActivityType::think , m_philosopher_setting.m_thinking_time );
     };
 
-    philosopher_setting m_philosopher_setting;
+
+    philosopher_setting<_waiter_T> m_philosopher_setting;
 
     std::thread m_lifethread;
 
     // int m_number_at_the_table;
 };
-}; //namespace dinner
+} //namespace dinner

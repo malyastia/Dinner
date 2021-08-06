@@ -40,4 +40,4 @@ private:
     std::vector<fork> &m_forks;
 
 };
-}; // namespace dinner
+} // namespace dinner
