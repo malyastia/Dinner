@@ -6,11 +6,14 @@ namespace dinner{
 class  unique_take
 {
 public:
+<<<<<<< HEAD
     unique_take()
     : m_left_fork(nullptr)
     , m_right_fork(nullptr)
     , m_success_take (false)
     {};
+=======
+>>>>>>> d282355bca4657d33fb120d2a234bbfcaa4f2603
 
     unique_take( fork* _left_fork, fork* _right_fork)
     : m_left_fork(_left_fork)
@@ -29,12 +32,26 @@ public:
                 m_left_fork->put_fork();
             }
         }
+<<<<<<< HEAD
 
     };
 
     operator bool() const 
     {
         return m_success_take; 
+=======
+    };
+
+    unique_take()
+    : m_left_fork(nullptr)
+    , m_right_fork(nullptr)
+    , m_success_take ( false)
+    {};
+
+    bool is_succes()
+    {
+        return m_success_take;
+>>>>>>> d282355bca4657d33fb120d2a234bbfcaa4f2603
     };
 
     ~unique_take()
