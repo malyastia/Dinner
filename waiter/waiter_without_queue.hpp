@@ -16,12 +16,7 @@ public:
     waiter_without_queue( std::vector<fork> & _forks )
     : m_forks{_forks}
     {};
-<<<<<<< HEAD
         
-=======
-
-    
->>>>>>> d282355bca4657d33fb120d2a234bbfcaa4f2603
 
     unique_take forks_take(int index_philosopher) 
     {

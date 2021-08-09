@@ -3,7 +3,6 @@
 
 #include "unique_take.hpp"
 
-
 #include <vector>
 #include <mutex>
 
@@ -21,39 +20,37 @@ public:
     {};
 
     unique_take forks_take(int index_philosopher) 
-    {       
-        if( condition_true(index_philosopher) )
+    {     
+        if( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) > m_philosopher_request[(index_philosopher+1) % m_forks.size()].load(std::memory_order_acquire) 
+            || m_philosopher_request[index_philosopher].load(std::memory_order_acquire) > m_philosopher_request[(index_philosopher -1) % m_forks.size() ].load(std::memory_order_acquire) ) 
         {
-            return unique_take{};
-        };
-
+            unique_take take_two_forks;
+            return take_two_forks;
         
+        }
+
         unique_take take_two_forks{  &m_forks[index_philosopher],  &m_forks[ ( index_philosopher + 1) % m_forks.size() ] };
 
         if( take_two_forks )
         {
-            m_philosopher_request[index_philosopher].fetch_add( 1,std::memory_order_acq_rel) ;
-            
-        }
-        return take_two_forks; 
+            m_philosopher_request[index_philosopher].fetch_add( 1,std::memory_order_release) ;
 
-        // unique_take empty_unique_take{};
-        // return empty_unique_take; 
+        }
+        return take_two_forks;
 
     }
-//если он больше соседей
+
+
     bool condition_true (int index_philosopher)
-    {        
-        if( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) > m_philosopher_request[ (index_philosopher+1) % m_forks.size() ].load(std::memory_order_acquire) 
-            || m_philosopher_request[index_philosopher].load(std::memory_order_acquire) > m_philosopher_request[ (index_philosopher-1) % m_forks.size() ].load(std::memory_order_acquire)  )
+    {    
+        if( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) <= m_philosopher_request[(index_philosopher+1) % m_forks.size()].load(std::memory_order_acquire) 
+            || m_philosopher_request[index_philosopher].load(std::memory_order_acquire) <= m_philosopher_request[(index_philosopher -1) % m_forks.size() ].load(std::memory_order_acquire) ) 
         {
-            printf( "%d %d %d",m_philosopher_request[ (index_philosopher+1) % m_forks.size() ].load(std::memory_order_acquire),
-            m_philosopher_request[index_philosopher].load(std::memory_order_acquire) , m_philosopher_request[ (index_philosopher-1) % m_forks.size() ].load(std::memory_order_acquire) );
-            std::cout << "YES" << std::endl;
-            return true;
-        }        
+            return false;
         
-        return false;
+        }
+        
+        return true;
     };
     
 /* 
