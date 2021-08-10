@@ -7,28 +7,47 @@
 
 #include "fork.hpp"
 #include "../waiter/unique_take.hpp"
+#include "../waiter/waiter_with_queue.hpp"
 
 namespace dinner{
 
-std::atomic_bool ready = {false};
+class start_eating_philosopher{
+
+public:
+
+    void start()
+    {
+        ready = true;
+    };
+
+    bool is_start(){
+        return ready;
+    }
+
+private:
+    std::atomic_bool ready = {false};
+
+};
+
 
 template<class _waiter_T>
 struct philosopher_setting
 {
-    philosopher_setting(int _number_at_the_table,
-        _waiter_T & _waiter,
-        std::chrono::milliseconds _thinking_time,
-        std::chrono::milliseconds _eating_time,
-        std::chrono::milliseconds _falling_time,
-        int _count_eat)
-
-    : m_log{ std::to_string( _number_at_the_table) }
-    , m_count_eat(_count_eat)
-    , m_eating_time{_eating_time}
-    , m_thinking_time{_thinking_time}
-    , m_falling_time(_falling_time)
-    , m_waiter(_waiter)
-    , m_number_at_the_table{_number_at_the_table}
+    philosopher_setting(int number_at_the_table,
+        start_eating_philosopher& start_eating,
+        _waiter_T & waiter,
+        std::chrono::milliseconds thinking_time,
+        std::chrono::milliseconds eating_time,
+        std::chrono::milliseconds falling_time,
+        int count_eat)
+    : m_log{ std::to_string( number_at_the_table) }
+    , m_count_eat( count_eat)
+    , m_eating_time{ eating_time}
+    , m_thinking_time{ thinking_time}
+    , m_falling_time( falling_time)
+    , m_waiter( waiter)
+    , m_start_eating_philosopher (start_eating)
+    , m_number_at_the_table{ number_at_the_table}
     {};
 
     int m_count_eat;
@@ -37,6 +56,7 @@ struct philosopher_setting
     std::chrono::milliseconds m_eating_time;
     std::chrono::milliseconds m_falling_time;
     _waiter_T& m_waiter;
+    start_eating_philosopher& m_start_eating_philosopher;
     PhilosopherEventLog m_log;
 };
 
@@ -76,18 +96,17 @@ private:
 
     void work()
     {
-        while (!ready);
+        while (! m_philosopher_setting.m_start_eating_philosopher.is_start());
 
         bool f = true;
-
-        for(int i = 0; i < m_philosopher_setting.m_count_eat;)
+        int i = m_philosopher_setting.m_count_eat;
+        while ( i > 0 )
         {
-            think();
-            
+            think();            
 
             if(  eat() )
             {
-                ++i;
+                --i;
             }
             else
             {
@@ -106,14 +125,9 @@ private:
             return false;
         }
 
-        m_philosopher_setting.m_log.startActivity(ActivityType::eat);
-        wait(m_philosopher_setting.m_eating_time ); 
-        m_philosopher_setting.m_log.endActivity( ActivityType::eat );
+        logging(ActivityType::eat);
         
         return true;
-        
-        
-
     };
 
     inline void wait( std::chrono::milliseconds numMs) 
@@ -123,18 +137,20 @@ private:
 
     void waiting_falling_time()
     {
-        m_philosopher_setting.m_log.startActivity( ActivityType::eatFailure);
-        wait( m_philosopher_setting.m_falling_time );
-        m_philosopher_setting.m_log.endActivity( ActivityType::eatFailure);
+       logging(ActivityType::eatFailure);
     };
 
 
     void think()
     {
-        m_philosopher_setting.m_log.startActivity( ActivityType::think);
-        wait( m_philosopher_setting.m_thinking_time );
-        m_philosopher_setting.m_log.endActivity( ActivityType::think);
+       logging(ActivityType::think);
+    };
 
+    void logging(ActivityType type)
+    {
+         m_philosopher_setting.m_log.startActivity( type);
+        wait( m_philosopher_setting.m_thinking_time );
+        m_philosopher_setting.m_log.endActivity( type);
     };
 
 
