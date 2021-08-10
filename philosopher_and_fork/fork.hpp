@@ -13,7 +13,7 @@ public:
 
     bool take_fork()
     {
-        return m_fork_mutex.try_lock();;
+        return m_fork_mutex.try_lock();
     };
     
     void put_fork()

@@ -10,6 +10,8 @@
 
 namespace dinner{
 
+std::atomic_bool ready = {false};
+
 template<class _waiter_T>
 struct philosopher_setting
 {
@@ -76,17 +78,21 @@ private:
     {
         while (!ready);
 
+        bool f = true;
+
         for(int i = 0; i < m_philosopher_setting.m_count_eat;)
         {
             think();
+            
 
-            while( ! eat() )
+            if(  eat() )
+            {
+                ++i;
+            }
+            else
             {
                 waiting_falling_time();
             }
-            ++i;
-            std::cout <<"eat"<< m_philosopher_setting.m_number_at_the_table<< std::endl;
-
         }
         
         m_philosopher_setting.m_log.startActivity( ActivityType::leave);
@@ -97,7 +103,6 @@ private:
         unique_take forks_taken = m_philosopher_setting.m_waiter.forks_take(m_philosopher_setting.m_number_at_the_table);
 
         if( !forks_taken ){
-            std::cout <<"false"<<std::endl;
             return false;
         }
 
@@ -107,7 +112,7 @@ private:
         
         return true;
         
-        // m_philosopher_setting.m_waiter.forks_put(m_philosopher_setting.m_number_at_the_table);
+        
 
     };
 

@@ -6,19 +6,19 @@ namespace dinner{
 class  unique_take
 {
 public:
-    unique_take()
+    int err;
+    unique_take() 
     : m_left_fork(nullptr)
     , m_right_fork(nullptr)
     , m_success_take (false)
-    {
-        std::cout << m_success_take << "HI" << std::endl;
-
-    };
+    , err(999)
+    {};
 
     unique_take( fork* _left_fork, fork* _right_fork)
     : m_left_fork(_left_fork)
     , m_right_fork(_right_fork)
     , m_success_take ( false)
+    , err(111)
     {        
         if( m_left_fork->take_fork() )
         {

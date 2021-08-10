@@ -14,7 +14,7 @@ class waiter_without_queue
 public:
     
     waiter_without_queue( std::vector<fork> & _forks )
-    : m_forks{_forks}
+    : m_forks(_forks)
     {};
         
 
