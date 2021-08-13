@@ -102,28 +102,32 @@ private:
         int i = m_philosopher_setting.m_count_eat;
         while ( i > 0 )
         {
-            think();            
-
-            if(  !eat(i) )
+            if(f)
             {
+                think();            
+            }
+            else{
                 waiting_falling_time();
             }
+
+            eat(i,f);
         }
         
         m_philosopher_setting.m_log.startActivity( ActivityType::leave);
     };
 
-    bool eat(int& count_food_eaten)
+    bool eat(int& count_food_eaten, bool& flag)
     {
         unique_take forks_taken{m_philosopher_setting.m_waiter.forks_take(m_philosopher_setting.m_number_at_the_table)};
             
         if( !forks_taken ){
+            flag = false;
             return false;
         }
         --count_food_eaten;
 
         logging(ActivityType::eat);
-        
+        flag = true;
         return true;
     };
 
