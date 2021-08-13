@@ -11,6 +11,10 @@ public:
     fork()
     {};
 
+    fork( const fork&) = delete;
+
+    fork& operator=( const fork& ) = delete;
+
     bool take_fork()
     {
         return m_fork_mutex.try_lock();

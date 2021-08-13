@@ -10,9 +10,7 @@ public:
     : m_left_fork(nullptr)
     , m_right_fork(nullptr)
     , m_success_take (false)
-    {
-        std::cout << "Error"<< m_success_take<<std::endl;
-    };
+    {};
 
     unique_take( fork* _left_fork, fork* _right_fork)
     : m_left_fork(_left_fork)
@@ -30,6 +28,42 @@ public:
                 m_left_fork->put_fork();
             }
         }
+
+    };
+
+    unique_take( unique_take&& unique_take_class)
+    : m_left_fork(unique_take_class.m_left_fork)
+    , m_right_fork(unique_take_class.m_right_fork)
+    , m_success_take ( unique_take_class.m_success_take)
+    {
+        unique_take_class.m_left_fork = nullptr;
+        unique_take_class.m_right_fork = nullptr;
+        unique_take_class.m_success_take=false;
+
+    };
+
+    unique_take( const unique_take&) = delete;
+
+    unique_take& operator=( const unique_take& ) = delete;
+
+    unique_take& operator=( unique_take&& unique_take_class)
+    {
+        if(&unique_take_class == this)
+        {
+            return *this;
+        }
+        delete m_left_fork;
+        delete m_right_fork;
+
+        m_left_fork = unique_take_class.m_left_fork;
+        m_right_fork = unique_take_class.m_right_fork;
+        m_success_take = unique_take_class.m_success_take;
+
+        unique_take_class.m_left_fork = nullptr;
+        unique_take_class.m_right_fork = nullptr;
+        unique_take_class.m_success_take=false;
+
+        return *this;
 
     };
 

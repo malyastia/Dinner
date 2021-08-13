@@ -104,11 +104,7 @@ private:
         {
             think();            
 
-            if(  eat() )
-            {
-                --i;
-            }
-            else
+            if(  !eat(i) )
             {
                 waiting_falling_time();
             }
@@ -117,13 +113,14 @@ private:
         m_philosopher_setting.m_log.startActivity( ActivityType::leave);
     };
 
-    bool eat()
+    bool eat(int& count_food_eaten)
     {
-        unique_take forks_taken = m_philosopher_setting.m_waiter.forks_take(m_philosopher_setting.m_number_at_the_table);
-
+        unique_take forks_taken{m_philosopher_setting.m_waiter.forks_take(m_philosopher_setting.m_number_at_the_table)};
+            
         if( !forks_taken ){
             return false;
         }
+        --count_food_eaten;
 
         logging(ActivityType::eat);
         
