@@ -1,5 +1,7 @@
 #pragma once
-#include "../philosopher_and_fork/fork.hpp"
+#include <optional>
+
+#include "fork.hpp"
 
 namespace dinner{
 
@@ -12,7 +14,7 @@ public:
     , m_success_take (false)
     {};
 
-    unique_take( fork* _left_fork, fork* _right_fork)
+    unique_take(fork* _left_fork, fork* _right_fork)
     : m_left_fork(_left_fork)
     , m_right_fork(_right_fork)
     , m_success_take ( false)
@@ -52,9 +54,7 @@ public:
         {
             return *this;
         }
-        delete m_left_fork;
-        delete m_right_fork;
-
+        
         m_left_fork = unique_take_class.m_left_fork;
         m_right_fork = unique_take_class.m_right_fork;
         m_success_take = unique_take_class.m_success_take;
@@ -64,7 +64,6 @@ public:
         unique_take_class.m_success_take=false;
 
         return *this;
-
     };
 
     operator bool() const 

@@ -31,7 +31,7 @@ private:
 
 
 
-template<class waiter_T>
+
 class philosopher
 {
     
@@ -42,7 +42,7 @@ struct philosopher_setting
 {
     philosopher_setting(int number_at_the_table,
         start_eating_philosopher& start_eating,
-        waiter_T & waiter,
+        waiter & waiter,
         std::chrono::milliseconds thinking_time,
         std::chrono::milliseconds eating_time,
         std::chrono::milliseconds falling_time,
@@ -62,7 +62,7 @@ struct philosopher_setting
     std::chrono::milliseconds m_thinking_time;
     std::chrono::milliseconds m_eating_time;
     std::chrono::milliseconds m_falling_time;
-    waiter_T& m_waiter;
+    waiter& m_waiter;
     start_eating_philosopher& m_start_eating_philosopher;
     PhilosopherEventLog m_log;
 };

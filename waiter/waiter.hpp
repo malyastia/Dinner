@@ -8,16 +8,15 @@
 
 namespace dinner{
 
-class waiter_without_queue 
+class waiter
 {
 public:
-    
-    waiter_without_queue( std::vector<fork> & _forks )
+    waiter( std::vector<fork> & _forks )
     : m_forks(_forks)
     {};
         
 
-    unique_take forks_take(int index_philosopher) 
+    virtual unique_take forks_take(int index_philosopher) 
     {
 
         unique_take take_two_forks{  &m_forks[index_philosopher],  &m_forks[ ( index_philosopher + 1) % m_forks.size()] };
@@ -27,7 +26,8 @@ public:
     };
 
 private:
+    
     std::vector<fork> &m_forks;
-};
 
-} //namespace dinner
+};
+} // namespace dinner
