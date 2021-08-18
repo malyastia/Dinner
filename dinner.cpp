@@ -1,8 +1,3 @@
-#include <atomic>
-#include <condition_variable>
-#include <thread>
-#include <shared_mutex>
-
 #include "library.hpp"
 #include "fork.hpp"
 #include "philosopher.hpp"

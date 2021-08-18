@@ -13,7 +13,6 @@ namespace dinner{
 class start_eating_philosopher{
 
 public:
-
     void start()
     {
         ready = true;
@@ -25,19 +24,13 @@ public:
 
 private:
     std::atomic_bool ready = {false};
-
 };
-
-
-
 
 template<class waiter_T>
 class philosopher
 {
     
 public:
-
-
 struct philosopher_setting
 {
     philosopher_setting(int number_at_the_table,
@@ -71,10 +64,6 @@ struct philosopher_setting
     : m_lifethread { &philosopher::work, this }
     , m_philosopher_setting {_philosopher_setting}
     {};
-    // philosopher()
-    // : m_lifethread { &philosopher::work, this }
-    // , m_philosopher_setting {_philosopher_setting}
-    // {};
 
     ~philosopher()
     {
