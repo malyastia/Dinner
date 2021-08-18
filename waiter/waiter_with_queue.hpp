@@ -1,78 +1,89 @@
 #pragma once
-#include "../philosopher_and_fork/fork.hpp"
-
-#include "unique_take.hpp"
-
-#include <vector>
-#include <mutex>
-
-#include "stdio.h"
+#include "fork.hpp"
 
 namespace dinner{
 
-class waiter_with_queue 
+class unique_take
 {
 public:
-    
-    waiter_with_queue( std::vector<fork> & _forks )
-    : m_forks(_forks)
-    , m_philosopher_request(_forks.size())
+    unique_take()
+    : m_left_fork(nullptr)
+    , m_right_fork(nullptr)
+    , m_success_take (false)
     {};
 
-    unique_take forks_take(int index_philosopher) 
-    {    
-
-        if( is_more_than_neighbors(index_philosopher) ) 
+    unique_take(fork* _left_fork, fork* _right_fork)
+    : m_left_fork(_left_fork)
+    , m_right_fork(_right_fork)
+    , m_success_take ( false)
+    {        
+        if( m_left_fork->take_fork() )
         {
-            return  std::move(unique_take{}); 
-        } 
-        
-        unique_take take_two_forks{  &m_forks[index_philosopher],  &m_forks[ ( index_philosopher + 1) % m_forks.size()] };
-        if(take_two_forks)
-        {
-            m_philosopher_request[index_philosopher].fetch_add(1,std::memory_order_release);
-        }   
-        return std::move(take_two_forks); 
-             
-    }
-
-
-    bool is_more_than_neighbors(int index_philosopher)
-    {    
-        if( index_philosopher!=0)
-        {
-            if( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) > m_philosopher_request[(index_philosopher+1)% m_forks.size() ].load(std::memory_order_acquire) || 
-              m_philosopher_request[index_philosopher].load(std::memory_order_acquire) > m_philosopher_request[(index_philosopher-1)% m_forks.size() ].load(std::memory_order_acquire) ) 
+            if( m_right_fork->take_fork() )
             {
-                return true;
+                m_success_take = true;
+            }
+            else
+            {
+                m_left_fork->put_fork();
             }
         }
-        else
-        {
-            if( m_philosopher_request[index_philosopher].load(std::memory_order_acquire) > m_philosopher_request[(index_philosopher+1)% m_forks.size() ].load(std::memory_order_acquire) || 
-                  m_philosopher_request[index_philosopher].load(std::memory_order_acquire) > m_philosopher_request[ m_forks.size()-1 ].load(std::memory_order_acquire) ) 
-            {
-                return true;
-            }
-        }
-        
-        return false;
+
     };
-    
-/* 
 
-    void forks_put(int index_philosopher) 
+    unique_take( unique_take&& unique_take_class)
+    : m_left_fork(unique_take_class.m_left_fork)
+    , m_right_fork(unique_take_class.m_right_fork)
+    , m_success_take ( unique_take_class.m_success_take)
     {
+        unique_take_class.m_left_fork = nullptr;
+        unique_take_class.m_right_fork = nullptr;
+        unique_take_class.m_success_take=false;
+
+    };
+
+    unique_take( const unique_take&) = delete;
+
+    unique_take& operator=( const unique_take& ) = delete;
+
+    unique_take& operator=( unique_take&& unique_take_class)
+    {
+        if(&unique_take_class == this)
+        {
+            return *this;
+        }
         
-        m_forks[ index_philosopher].put_fork();
-        m_forks[ (index_philosopher +1) % m_forks.size()].put_fork();
-           
-    };  */   
+        m_left_fork = unique_take_class.m_left_fork;
+        m_right_fork = unique_take_class.m_right_fork;
+        m_success_take = unique_take_class.m_success_take;
+
+        unique_take_class.m_left_fork = nullptr;
+        unique_take_class.m_right_fork = nullptr;
+        unique_take_class.m_success_take=false;
+
+        return *this;
+    };
+
+    operator bool() const 
+    {
+        return m_success_take; 
+    };
+
+    ~unique_take()
+    {
+        if(m_success_take)
+        {
+            m_left_fork->put_fork();
+            m_right_fork->put_fork();
+        }
+    };
 
 private:
+    fork* m_left_fork;
+    fork* m_right_fork;
 
-    std::vector<fork> &m_forks;
-    std::vector<std::atomic_int> m_philosopher_request;
+    bool m_success_take;
 
 };
+
 } // namespace dinner

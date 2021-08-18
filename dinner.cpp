@@ -1,14 +1,14 @@
-#include "lib/library.hpp"
+#include <atomic>
+#include <condition_variable>
+#include <thread>
+#include <shared_mutex>
+
+#include "library.hpp"
 #include "philosopher_and_fork/fork.hpp"
 #include "philosopher_and_fork/philosopher.hpp"
 
 #include "waiter/waiter_without_queue.hpp"
 #include "waiter/waiter_with_queue.hpp"
-
-#include <atomic>
-#include <condition_variable>
-#include <thread>
-#include <shared_mutex>
 
 namespace dinner_desk{
     
@@ -20,37 +20,37 @@ void dining( int eat_count)
 
     dinner::start_eating_philosopher for_start_eating_philosopher;
 
-    // dinner::waiter_without_queue local_waiter{forks};
+    dinner::waiter_without_queue local_waiter{forks};
    
-    // dinner::philosopher_setting<dinner::waiter_without_queue> philosoph0 {0, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(5), std::chrono::milliseconds(25), std::chrono::milliseconds(5), eat_count};
-    // dinner::philosopher_setting<dinner::waiter_without_queue> philosoph1 {1, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(5), std::chrono::milliseconds(10), std::chrono::milliseconds(5),eat_count};
-    // dinner::philosopher_setting<dinner::waiter_without_queue> philosoph2 {2, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(5), std::chrono::milliseconds(25), std::chrono::milliseconds(5),eat_count};
-    // dinner::philosopher_setting<dinner::waiter_without_queue> philosoph3 {3, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), std::chrono::milliseconds(5),eat_count};
-    // dinner::philosopher_setting<dinner::waiter_without_queue> philosoph4 {4, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), std::chrono::milliseconds(5),eat_count};
-    // dinner::philosopher_setting<dinner::waiter_without_queue> philosoph5 {5, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), std::chrono::milliseconds(5),eat_count};
+    dinner::philosopher<dinner::waiter_without_queue>::philosopher_setting philosoph0 {0, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(5), std::chrono::milliseconds(25), std::chrono::milliseconds(5), eat_count};
+    dinner::philosopher<dinner::waiter_without_queue>::philosopher_setting philosoph1 {1, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(5), std::chrono::milliseconds(10), std::chrono::milliseconds(5),eat_count};
+    dinner::philosopher<dinner::waiter_without_queue>::philosopher_setting philosoph2 {2, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(5), std::chrono::milliseconds(25), std::chrono::milliseconds(5),eat_count};
+    dinner::philosopher<dinner::waiter_without_queue>::philosopher_setting philosoph3 {3, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), std::chrono::milliseconds(5),eat_count};
+    dinner::philosopher<dinner::waiter_without_queue>::philosopher_setting philosoph4 {4, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), std::chrono::milliseconds(5),eat_count};
+    dinner::philosopher<dinner::waiter_without_queue>::philosopher_setting philosoph5 {5, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(25), std::chrono::milliseconds(5),eat_count};
 
-    // std::array<dinner::philosopher<dinner::waiter_without_queue>, count_philosopher> philosophers
-    // {
-    //     {        
-    //         {philosoph0},
-    //         {philosoph1},
-    //         {philosoph2}, 
-    //         {philosoph3}, 
-    //         {philosoph4},  
-    //         {philosoph5}, 
-    //     }        
-    // };
+    std::array<dinner::philosopher<dinner::waiter_without_queue>, count_philosopher> philosophers
+    {
+        {        
+            {philosoph0},
+            {philosoph1},
+            {philosoph2}, 
+            {philosoph3}, 
+            {philosoph4},  
+            {philosoph5}
+        }        
+    };
 
 
-    dinner::waiter_with_queue local_waiter{forks};
+    /* dinner::waiter_with_queue local_waiter{forks};
 
-    dinner::philosopher_setting<dinner::waiter_with_queue> philosoph0 {0, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(50), std::chrono::milliseconds(5), eat_count};
-    dinner::philosopher_setting<dinner::waiter_with_queue> philosoph1 {1, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(50), std::chrono::milliseconds(5),eat_count};
-    dinner::philosopher_setting<dinner::waiter_with_queue> philosoph2 {2, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(50), std::chrono::milliseconds(5),eat_count};
-    dinner::philosopher_setting<dinner::waiter_with_queue> philosoph3 {3, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(50), std::chrono::milliseconds(5),eat_count};
-    dinner::philosopher_setting<dinner::waiter_with_queue> philosoph4 {4, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(50), std::chrono::milliseconds(5),eat_count};
-    dinner::philosopher_setting<dinner::waiter_with_queue> philosoph5 {5, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(10), std::chrono::milliseconds(50), std::chrono::milliseconds(5),eat_count};
-    
+    dinner::philosopher<dinner::waiter_with_queue>::philosopher_setting philosoph0{0, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(30), std::chrono::milliseconds(50), std::chrono::milliseconds(20), eat_count};
+    dinner::philosopher<dinner::waiter_with_queue>::philosopher_setting philosoph1{1, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(30), std::chrono::milliseconds(50), std::chrono::milliseconds(20), eat_count};
+    dinner::philosopher<dinner::waiter_with_queue>::philosopher_setting philosoph2{2, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(30), std::chrono::milliseconds(50), std::chrono::milliseconds(20), eat_count};
+    dinner::philosopher<dinner::waiter_with_queue>::philosopher_setting philosoph3{3, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(30), std::chrono::milliseconds(50), std::chrono::milliseconds(20), eat_count};
+    dinner::philosopher<dinner::waiter_with_queue>::philosopher_setting philosoph4{4, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(30), std::chrono::milliseconds(50), std::chrono::milliseconds(20), eat_count};
+    dinner::philosopher<dinner::waiter_with_queue>::philosopher_setting philosoph5{5, for_start_eating_philosopher, local_waiter, std::chrono::milliseconds(30), std::chrono::milliseconds(50), std::chrono::milliseconds(20), eat_count};
+
     std::array<dinner::philosopher<dinner::waiter_with_queue>, count_philosopher> philosophers
     {
         {        
@@ -59,11 +59,11 @@ void dining( int eat_count)
             {philosoph2}, 
             {philosoph3}, 
             {philosoph4},  
-            {philosoph5}, 
+            {philosoph5}
         }        
-    };
-
+    }; */
     
+
     for_start_eating_philosopher.start();        
     for(auto &ph:philosophers){
             ph.joining_thread() ;
@@ -71,7 +71,7 @@ void dining( int eat_count)
 
     for(auto &ph:philosophers){
         ph.eventLog().printSummary();
-    }
+    } 
     
 }
 

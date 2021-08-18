@@ -1,11 +1,10 @@
 #pragma once
-#include "../philosopher_and_fork/fork.hpp"
-#include "unique_take.hpp"
 
 #include <vector>
 #include <mutex>
 
-#include <algorithm>
+#include "fork.hpp"
+#include "unique_take.hpp"
 
 namespace dinner{
 
@@ -27,18 +26,8 @@ public:
 
     };
 
-    /* void forks_put(int index_philosopher) 
-    {
-        
-        m_forks[ index_philosopher].put_fork();
-        m_forks[ (index_philosopher +1) % m_forks.size()].put_fork();
-           
-    }; */
-
 private:
-
     std::vector<fork> &m_forks;
-
 };
 
 } //namespace dinner

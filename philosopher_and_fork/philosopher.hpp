@@ -4,10 +4,9 @@
 #include <thread>
 #include <shared_mutex>
 
-
 #include "fork.hpp"
-#include "../waiter/unique_take.hpp"
-#include "../waiter/waiter_with_queue.hpp"
+#include "unique_take.hpp"
+#include "waiter_with_queue.hpp"
 
 namespace dinner{
 
@@ -30,12 +29,20 @@ private:
 };
 
 
-template<class _waiter_T>
+
+
+template<class waiter_T>
+class philosopher
+{
+    
+public:
+
+
 struct philosopher_setting
 {
     philosopher_setting(int number_at_the_table,
         start_eating_philosopher& start_eating,
-        _waiter_T & waiter,
+        waiter_T & waiter,
         std::chrono::milliseconds thinking_time,
         std::chrono::milliseconds eating_time,
         std::chrono::milliseconds falling_time,
@@ -55,21 +62,19 @@ struct philosopher_setting
     std::chrono::milliseconds m_thinking_time;
     std::chrono::milliseconds m_eating_time;
     std::chrono::milliseconds m_falling_time;
-    _waiter_T& m_waiter;
+    waiter_T& m_waiter;
     start_eating_philosopher& m_start_eating_philosopher;
     PhilosopherEventLog m_log;
 };
-
-template<class _waiter_T>
-class philosopher
-{
     
-public:
-    
-    philosopher( philosopher_setting<_waiter_T> _philosopher_setting)
+    philosopher( philosopher_setting _philosopher_setting)
     : m_lifethread { &philosopher::work, this }
     , m_philosopher_setting {_philosopher_setting}
     {};
+    // philosopher()
+    // : m_lifethread { &philosopher::work, this }
+    // , m_philosopher_setting {_philosopher_setting}
+    // {};
 
     ~philosopher()
     {
@@ -93,7 +98,6 @@ public:
     };
 
 private:
-
     void work()
     {
         while (! m_philosopher_setting.m_start_eating_philosopher.is_start());
@@ -115,7 +119,8 @@ private:
         
         m_philosopher_setting.m_log.startActivity( ActivityType::leave);
     };
-
+    
+private:
     bool eat(int& count_food_eaten, bool& flag)
     {
         unique_take forks_taken{m_philosopher_setting.m_waiter.forks_take(m_philosopher_setting.m_number_at_the_table)};
@@ -126,11 +131,12 @@ private:
         }
         --count_food_eaten;
 
-        logging(ActivityType::eat);
+        logging(m_philosopher_setting.m_eating_time, ActivityType::eat);
         flag = true;
         return true;
     };
 
+private:
     inline void wait( std::chrono::milliseconds numMs) 
     { 
         std::this_thread::sleep_for(std::chrono::milliseconds(numMs));
@@ -138,25 +144,23 @@ private:
 
     void waiting_falling_time()
     {
-       logging(ActivityType::eatFailure);
+       logging(m_philosopher_setting.m_falling_time, ActivityType::eatFailure);
     };
-
 
     void think()
     {
-       logging(ActivityType::think);
+       logging(m_philosopher_setting.m_thinking_time, ActivityType::think);
     };
 
-    void logging(ActivityType type)
+    void logging(std::chrono::milliseconds time,ActivityType type)
     {
-         m_philosopher_setting.m_log.startActivity( type);
-        wait( m_philosopher_setting.m_thinking_time );
+        m_philosopher_setting.m_log.startActivity( type);
+        wait( time );
         m_philosopher_setting.m_log.endActivity( type);
     };
 
-
-    philosopher_setting<_waiter_T> m_philosopher_setting;
-
+private:
+    philosopher_setting m_philosopher_setting;
     std::thread m_lifethread;
 
 };
