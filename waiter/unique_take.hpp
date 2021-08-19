@@ -1,5 +1,5 @@
+
 #pragma once
-#include <optional>
 
 #include "fork.hpp"
 
@@ -12,7 +12,7 @@ public:
     : m_left_fork(nullptr)
     , m_right_fork(nullptr)
     , m_success_take (false)
-    {};
+    {}
 
     unique_take(fork* _left_fork, fork* _right_fork)
     : m_left_fork(_left_fork)
@@ -31,9 +31,10 @@ public:
             }
         }
 
-    };
+    }
 
-    unique_take( unique_take&& unique_take_class)
+public:
+    unique_take( unique_take&& unique_take_class) 
     : m_left_fork(unique_take_class.m_left_fork)
     , m_right_fork(unique_take_class.m_right_fork)
     , m_success_take ( unique_take_class.m_success_take)
@@ -42,14 +43,19 @@ public:
         unique_take_class.m_right_fork = nullptr;
         unique_take_class.m_success_take=false;
 
-    };
+    }
 
-    unique_take( const unique_take&) = delete;
+    unique_take( const unique_take& unique_take_class)
+    {
+        m_left_fork = unique_take_class.m_left_fork;
+        m_right_fork = unique_take_class.m_right_fork;
+        m_success_take = false;
+    }
 
-    unique_take& operator=( const unique_take& ) = delete;
-
+public:
     unique_take& operator=( unique_take&& unique_take_class)
     {
+
         if(&unique_take_class == this)
         {
             return *this;
@@ -64,12 +70,22 @@ public:
         unique_take_class.m_success_take=false;
 
         return *this;
-    };
+    }
+    
+    unique_take& operator=( const unique_take& unique_take_class) 
+    {
+        m_left_fork = unique_take_class.m_left_fork;
+        m_right_fork = unique_take_class.m_right_fork;
+        m_success_take = unique_take_class.m_success_take;
+        
+        return *this;
+    }
 
+public:
     operator bool() const 
     {
         return m_success_take; 
-    };
+    }
 
     ~unique_take()
     {
@@ -83,7 +99,6 @@ public:
 private:
     fork* m_left_fork;
     fork* m_right_fork;
-
     bool m_success_take;
 
 };

@@ -17,7 +17,7 @@ public:
     void start()
     {
         ready = true;
-    };
+    }
 
     bool is_start(){
         return ready;
@@ -27,10 +27,6 @@ private:
     std::atomic_bool ready = {false};
 
 };
-
-
-
-
 
 class philosopher
 {
@@ -42,20 +38,12 @@ struct philosopher_setting
 {
     philosopher_setting(int number_at_the_table,
         start_eating_philosopher& start_eating,
-        waiter & waiter,
-        std::chrono::milliseconds thinking_time,
-        std::chrono::milliseconds eating_time,
-        std::chrono::milliseconds falling_time,
-        int count_eat)
+        waiter & waiter)
     : m_log{ std::to_string( number_at_the_table) }
-    , m_count_eat( count_eat)
-    , m_eating_time{ eating_time}
-    , m_thinking_time{ thinking_time}
-    , m_falling_time( falling_time)
     , m_waiter( waiter)
     , m_start_eating_philosopher (start_eating)
     , m_number_at_the_table{ number_at_the_table}
-    {};
+    {}
 
     int m_count_eat;
     int m_number_at_the_table;
@@ -71,10 +59,6 @@ struct philosopher_setting
     : m_lifethread { &philosopher::work, this }
     , m_philosopher_setting {_philosopher_setting}
     {};
-    // philosopher()
-    // : m_lifethread { &philosopher::work, this }
-    // , m_philosopher_setting {_philosopher_setting}
-    // {};
 
     ~philosopher()
     {
@@ -121,19 +105,18 @@ private:
     };
     
 private:
-    bool eat(int& count_food_eaten, bool& flag)
+    void eat(int& count_food_eaten, bool& flag)
     {
         unique_take forks_taken{m_philosopher_setting.m_waiter.forks_take(m_philosopher_setting.m_number_at_the_table)};
             
         if( !forks_taken ){
             flag = false;
-            return false;
+            return;
         }
         --count_food_eaten;
 
         logging(m_philosopher_setting.m_eating_time, ActivityType::eat);
         flag = true;
-        return true;
     };
 
 private:
