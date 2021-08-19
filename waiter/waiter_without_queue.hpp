@@ -14,19 +14,20 @@ public:
     
     waiter_without_queue( std::vector<fork> & _forks )
     : m_forks(_forks)
-    {};
-        
+    {}
 
     unique_take forks_take(int index_philosopher) 
     {
-
-        unique_take take_two_forks{  &m_forks[index_philosopher],  &m_forks[ ( index_philosopher + 1) % m_forks.size()] };
-
-        return take_two_forks;
-
-    };
+        return unique_take{  &m_forks[index_philosopher],  &m_forks[ ( index_philosopher + 1) % m_forks.size()] };
+    }
 
 private:
+
+    int index_next(int index)
+    {
+        return ((index + 1) % m_forks.size());
+    }
+
     std::vector<fork> &m_forks;
 };
 

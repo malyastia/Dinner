@@ -11,7 +11,7 @@ public:
     : m_left_fork(nullptr)
     , m_right_fork(nullptr)
     , m_success_take (false)
-    {};
+    {}
 
     unique_take(fork* _left_fork, fork* _right_fork)
     : m_left_fork(_left_fork)
@@ -32,23 +32,33 @@ public:
 
     };
 
-    unique_take( unique_take&& unique_take_class)
+    //move
+    unique_take( unique_take&& unique_take_class) 
     : m_left_fork(unique_take_class.m_left_fork)
     , m_right_fork(unique_take_class.m_right_fork)
     , m_success_take ( unique_take_class.m_success_take)
     {
+        std::cout << "move constructor"<<std::endl;
         unique_take_class.m_left_fork = nullptr;
         unique_take_class.m_right_fork = nullptr;
         unique_take_class.m_success_take=false;
 
-    };
+    }
 
-    unique_take( const unique_take&) = delete;
+    //copy
+    unique_take( const unique_take& unique_take_class)
+    {
+        std::cout << "copy constructor"<<std::endl;
+        m_left_fork = unique_take_class.m_left_fork;
+        m_right_fork = unique_take_class.m_right_fork;
+        m_success_take = false;
+    }
 
-    unique_take& operator=( const unique_take& ) = delete;
-
+    //move
     unique_take& operator=( unique_take&& unique_take_class)
     {
+        std::cout << "move"<<std::endl;
+
         if(&unique_take_class == this)
         {
             return *this;
@@ -63,12 +73,23 @@ public:
         unique_take_class.m_success_take=false;
 
         return *this;
-    };
+    }
+    
+    unique_take& operator=( const unique_take& unique_take_class) 
+    {
+        std::cout << "copy"<<std::endl;
+
+        m_left_fork = unique_take_class.m_left_fork;
+        m_right_fork = unique_take_class.m_right_fork;
+        m_success_take = unique_take_class.m_success_take;
+        
+        return *this;
+    }
 
     operator bool() const 
     {
         return m_success_take; 
-    };
+    }
 
     ~unique_take()
     {
@@ -82,7 +103,6 @@ public:
 private:
     fork* m_left_fork;
     fork* m_right_fork;
-
     bool m_success_take;
 
 };

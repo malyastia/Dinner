@@ -27,16 +27,11 @@ private:
 
 };
 
-
-
-
 template<class waiter_T>
 class philosopher
 {
     
 public:
-
-
 struct philosopher_setting
 {
     philosopher_setting(int number_at_the_table,
@@ -108,19 +103,18 @@ private:
     };
     
 private:
-    bool eat(int& count_food_eaten, bool& flag)
+    void eat(int& count_food_eaten, bool& flag)
     {
-        unique_take forks_taken{m_philosopher_setting.m_waiter.forks_take(m_philosopher_setting.m_number_at_the_table)};
+        unique_take forks_taken{ m_philosopher_setting.m_waiter.forks_take(m_philosopher_setting.m_number_at_the_table) };
             
         if( !forks_taken ){
             flag = false;
-            return false;
+            return;
         }
         --count_food_eaten;
 
         logging(m_philosopher_setting.m_eating_time, ActivityType::eat);
         flag = true;
-        return true;
     };
 
 private:

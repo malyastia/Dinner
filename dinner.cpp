@@ -83,6 +83,5 @@ int main()
 {
     int eat_count = 5;
     dinner_desk::dining( eat_count);
-    
     return 0;
 }
